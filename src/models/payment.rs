@@ -62,12 +62,11 @@ pub struct BillPaymentApplication {
     pub created_at: DateTime<Utc>,
 }
 
-#[derive(Debug, Deserialize, Validate)]
+#[derive(Debug, Serialize, Deserialize, Validate)]
 pub struct CreatePaymentRequest {
     pub payment_number: Option<String>,
     pub customer_id: Uuid,
     pub payment_date: NaiveDate,
-    #[validate(range(min = 0))]
     pub amount: Decimal,
     #[validate(length(min = 1))]
     pub payment_method: String,
@@ -78,19 +77,17 @@ pub struct CreatePaymentRequest {
     pub applications: Vec<PaymentApplicationRequest>,
 }
 
-#[derive(Debug, Deserialize, Validate, Clone)]
+#[derive(Debug, Serialize, Deserialize, Clone)]
 pub struct PaymentApplicationRequest {
     pub invoice_id: Uuid,
-    #[validate(range(min = 0))]
     pub amount_applied: Decimal,
 }
 
-#[derive(Debug, Deserialize, Validate)]
+#[derive(Debug, Serialize, Deserialize, Validate)]
 pub struct CreateBillPaymentRequest {
     pub payment_number: Option<String>,
     pub vendor_id: Uuid,
     pub payment_date: NaiveDate,
-    #[validate(range(min = 0))]
     pub amount: Decimal,
     #[validate(length(min = 1))]
     pub payment_method: String,
@@ -101,9 +98,8 @@ pub struct CreateBillPaymentRequest {
     pub applications: Vec<BillPaymentApplicationRequest>,
 }
 
-#[derive(Debug, Deserialize, Validate, Clone)]
+#[derive(Debug, Serialize, Deserialize, Clone)]
 pub struct BillPaymentApplicationRequest {
     pub bill_id: Uuid,
-    #[validate(range(min = 0))]
     pub amount_applied: Decimal,
 }

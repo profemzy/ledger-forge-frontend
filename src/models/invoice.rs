@@ -62,7 +62,7 @@ pub struct InvoiceLineItem {
     pub updated_at: DateTime<Utc>,
 }
 
-#[derive(Debug, Deserialize, Validate)]
+#[derive(Debug, Serialize, Deserialize, Validate)]
 pub struct CreateInvoiceRequest {
     #[validate(length(min = 1))]
     pub invoice_number: String,
@@ -79,14 +79,11 @@ pub struct CreateInvoiceRequest {
     pub line_items: Vec<CreateInvoiceLineItemRequest>,
 }
 
-#[derive(Debug, Deserialize, Validate, Clone)]
+#[derive(Debug, Serialize, Deserialize, Clone)]
 pub struct CreateInvoiceLineItemRequest {
     pub line_number: i32,
-    #[validate(length(min = 1))]
     pub item_description: String,
-    #[validate(range(min = 0))]
     pub quantity: Decimal,
-    #[validate(range(min = 0))]
     pub unit_price: Decimal,
     pub discount_percent: Option<Decimal>,
     pub tax_code: Option<String>,

@@ -15,14 +15,17 @@ Replace QuickBooks with a bespoke accounting platform that offers:
 
 ## 🚀 Current Status
 
-**Phase 1: Foundation & Core Engine** - ✅ In Progress
+**Phase 1: Foundation & API Authentication** - ✅ 60% Complete
 
 - [x] Project initialization with Axum framework
-- [x] PostgreSQL database schema design
+- [x] PostgreSQL database schema design (16 tables)
 - [x] QuickBooks-compatible data model
 - [x] Double-entry accounting core
-- [x] Rust data models with validation
-- [ ] JWT authentication
+- [x] Rust data models with validation (9 models)
+- [x] **JWT authentication (COMPLETE)**
+- [x] **API error handling & responses**
+- [x] **User registration & login**
+- [x] **Axum server with CORS & logging**
 - [ ] Chart of Accounts API
 - [ ] Transaction API endpoints
 
@@ -93,9 +96,48 @@ createdb ledger_forge -O ledger_user
 sqlx migrate run
 ```
 
-5. Build the project:
+5. Run the server:
 ```bash
-cargo build
+cargo run
+```
+
+The server will start on `http://localhost:3000` (or the port specified in your `.env` file).
+
+## 🚀 Quick Start
+
+### 1. Check Server Health
+```bash
+curl http://localhost:3000/api/v1/health
+```
+
+### 2. Register a User
+```bash
+curl -X POST http://localhost:3000/api/v1/auth/register \
+  -H 'Content-Type: application/json' \
+  -d '{
+    "username": "admin",
+    "email": "admin@example.com",
+    "password": "YourSecurePassword123",
+    "role": "admin"
+  }'
+```
+
+### 3. Login
+```bash
+curl -X POST http://localhost:3000/api/v1/auth/login \
+  -H 'Content-Type: application/json' \
+  -d '{
+    "username": "admin",
+    "password": "YourSecurePassword123"
+  }'
+```
+
+This returns an `access_token` that you can use for authenticated requests.
+
+### 4. Get Current User (Protected Route)
+```bash
+curl http://localhost:3000/api/v1/auth/me \
+  -H 'Authorization: Bearer <your-access-token>'
 ```
 
 ## 🗄️ Database Migrations
@@ -131,18 +173,32 @@ ledger-forge/
 ## 🎯 Features
 
 ### Implemented ✅
-- Double-entry accounting engine
-- QuickBooks-compatible schema
-- Type-safe Rust models
-- Database migrations
-- Input validation
-- UUID-based entities
+- **Database Foundation**
+  - Double-entry accounting engine (database-level)
+  - QuickBooks-compatible schema (16 tables)
+  - Type-safe Rust models (9 models)
+  - Database migrations with SQLx
+  - UUID-based entities
+
+- **Authentication & Security**
+  - JWT token authentication (access + refresh tokens)
+  - Argon2 password hashing
+  - User registration & login
+  - Token validation & expiry
+  - Input validation with validator crate
+
+- **API Infrastructure**
+  - Axum web server with async runtime
+  - Centralized error handling
+  - Standardized JSON responses
+  - CORS configuration
+  - Request tracing & logging
+  - Health check endpoint
 
 ### In Progress 🚧
-- JWT authentication
 - Chart of Accounts API
 - Transaction management API
-- User management
+- Role-based access control
 
 ### Planned 📋
 - Financial reporting (P&L, Balance Sheet)
@@ -153,25 +209,45 @@ ledger-forge/
 - WebAssembly frontend
 - Multi-currency support
 
-## 📖 API Design (Planned)
+## 📖 API Endpoints
 
-### Authentication
-- `POST /api/v1/auth/login` - User login
+### Health & Status (LIVE ✅)
+- `GET /api/v1/health` - Health check & database status
+
+### Authentication (LIVE ✅)
 - `POST /api/v1/auth/register` - User registration
+  ```bash
+  curl -X POST http://localhost:3000/api/v1/auth/register \
+    -H 'Content-Type: application/json' \
+    -d '{"username":"admin","email":"admin@example.com","password":"SecurePass123","role":"admin"}'
+  ```
+- `POST /api/v1/auth/login` - User login
+  ```bash
+  curl -X POST http://localhost:3000/api/v1/auth/login \
+    -H 'Content-Type: application/json' \
+    -d '{"username":"admin","password":"SecurePass123"}'
+  ```
 - `POST /api/v1/auth/refresh` - Token refresh
+- `GET /api/v1/auth/me` - Get current user (requires auth header)
+  ```bash
+  curl http://localhost:3000/api/v1/auth/me \
+    -H 'Authorization: Bearer <your-jwt-token>'
+  ```
 
-### Chart of Accounts
+### Chart of Accounts (Planned 📋)
 - `GET /api/v1/accounts` - List accounts
 - `POST /api/v1/accounts` - Create account
 - `GET /api/v1/accounts/:id` - Get account details
 - `PUT /api/v1/accounts/:id` - Update account
+- `DELETE /api/v1/accounts/:id` - Deactivate account
 
-### Transactions
+### Transactions (Planned 📋)
 - `GET /api/v1/transactions` - List transactions
 - `POST /api/v1/transactions` - Create transaction
 - `GET /api/v1/transactions/:id` - Get transaction details
+- `PUT /api/v1/transactions/:id/status` - Update status (draft/posted/void)
 
-### Reports
+### Reports (Planned 📋)
 - `GET /api/v1/reports/trial-balance` - Trial balance
 - `GET /api/v1/reports/profit-loss` - P&L statement
 - `GET /api/v1/reports/balance-sheet` - Balance sheet

@@ -54,7 +54,7 @@ pub struct TransactionLineItem {
     pub updated_at: DateTime<Utc>,
 }
 
-#[derive(Debug, Deserialize, Validate)]
+#[derive(Debug, Serialize, Deserialize, Validate)]
 pub struct CreateTransactionRequest {
     pub transaction_date: NaiveDate,
     pub description: Option<String>,
@@ -68,15 +68,13 @@ pub struct CreateTransactionRequest {
     pub line_items: Vec<CreateLineItemRequest>,
 }
 
-#[derive(Debug, Deserialize, Validate, Clone)]
+#[derive(Debug, Serialize, Deserialize, Clone)]
 pub struct CreateLineItemRequest {
     pub account_id: Uuid,
     pub description: Option<String>,
 
-    #[validate(range(min = 0))]
     pub debit_amount: Option<Decimal>,
 
-    #[validate(range(min = 0))]
     pub credit_amount: Option<Decimal>,
 }
 

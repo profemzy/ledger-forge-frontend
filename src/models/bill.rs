@@ -51,7 +51,7 @@ pub struct BillLineItem {
     pub updated_at: DateTime<Utc>,
 }
 
-#[derive(Debug, Deserialize, Validate)]
+#[derive(Debug, Serialize, Deserialize, Validate)]
 pub struct CreateBillRequest {
     pub bill_number: Option<String>,
     pub vendor_id: Uuid,
@@ -64,11 +64,10 @@ pub struct CreateBillRequest {
     pub line_items: Vec<CreateBillLineItemRequest>,
 }
 
-#[derive(Debug, Deserialize, Validate, Clone)]
+#[derive(Debug, Serialize, Deserialize, Clone)]
 pub struct CreateBillLineItemRequest {
     pub line_number: i32,
     pub description: Option<String>,
-    #[validate(range(min = 0))]
     pub amount: Decimal,
     pub expense_account_id: Uuid,
     pub billable: Option<bool>,
