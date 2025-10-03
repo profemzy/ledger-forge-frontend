@@ -1,0 +1,53 @@
+# Rust / Cargo
+/target
+**/*.rs.bk
+*.pdb
+# Note: Cargo.lock is committed for binary projects (applications)
+
+# Environment files
+.env
+.env.local
+.env.*.local
+
+# Database
+*.db
+*.sqlite
+*.sqlite3
+
+# Logs
+*.log
+logs/
+
+# IDE / Editor
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+.DS_Store
+.fleet/
+.claude/
+
+# OS
+Thumbs.db
+.DS_Store
+
+# Build artifacts
+dist/
+build/
+
+# Testing
+.coverage
+htmlcov/
+
+# Backup files
+*.bak
+*.backup
+*~
+
+# SQLx
+.sqlx/
+
+# Documentation builds
+docs/_build/
+site/
