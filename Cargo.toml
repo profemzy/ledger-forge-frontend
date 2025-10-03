@@ -11,7 +11,7 @@ tower = "0.5"
 tower-http = { version = "0.6", features = ["cors", "trace"] }
 
 # Database
-sqlx = { version = "0.8", features = ["runtime-tokio-rustls", "postgres", "uuid", "chrono", "migrate"] }
+sqlx = { version = "0.8", features = ["runtime-tokio-rustls", "postgres", "uuid", "chrono", "migrate", "rust_decimal"] }
 
 # Serialization
 serde = { version = "1.0", features = ["derive"] }
@@ -41,3 +41,18 @@ chrono = { version = "0.4", features = ["serde"] }
 
 # Decimal numbers for financial calculations
 rust_decimal = { version = "1.36", features = ["serde", "db-postgres"] }
+
+[dev-dependencies]
+# Testing framework
+tokio-test = "0.4"
+
+# HTTP testing
+axum-test = "15"
+reqwest = { version = "0.12", features = ["json"] }
+
+# Assertions & utilities
+assert-json-diff = "2.0"
+fake = { version = "2.9", features = ["derive"] }
+
+# Test utilities
+serial_test = "3"

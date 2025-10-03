@@ -4,7 +4,6 @@ use axum::{
     Json,
 };
 use serde::Serialize;
-use serde_json::json;
 
 /// Standard success response wrapper
 #[derive(Debug, Serialize)]
@@ -24,6 +23,7 @@ impl<T: Serialize> ApiResponse<T> {
         }
     }
 
+    #[allow(dead_code)]
     pub fn success_with_message(data: T, message: String) -> Self {
         Self {
             success: true,
@@ -39,7 +39,8 @@ impl<T: Serialize> IntoResponse for ApiResponse<T> {
     }
 }
 
-/// Paginated response
+/// Paginated response (for future pagination features)
+#[allow(dead_code)]
 #[derive(Debug, Serialize)]
 pub struct PaginatedResponse<T: Serialize> {
     pub success: bool,
@@ -51,6 +52,7 @@ pub struct PaginatedResponse<T: Serialize> {
 }
 
 impl<T: Serialize> PaginatedResponse<T> {
+    #[allow(dead_code)]
     pub fn new(data: Vec<T>, page: i64, per_page: i64, total: i64) -> Self {
         let total_pages = (total as f64 / per_page as f64).ceil() as i64;
         Self {
@@ -78,7 +80,8 @@ pub struct HealthResponse {
     pub database: String,
 }
 
-/// Empty response for successful operations with no data
+/// Empty response for successful operations with no data (future use)
+#[allow(dead_code)]
 #[derive(Debug, Serialize)]
 pub struct EmptyResponse {}
 
@@ -87,7 +90,8 @@ pub fn success<T: Serialize>(data: T) -> ApiResponse<T> {
     ApiResponse::success(data)
 }
 
-/// Helper function to create a success response with message
+/// Helper function to create a success response with message (future use)
+#[allow(dead_code)]
 pub fn success_with_message<T: Serialize>(data: T, message: impl Into<String>) -> ApiResponse<T> {
     ApiResponse::success_with_message(data, message.into())
 }
@@ -97,7 +101,8 @@ pub fn created<T: Serialize>(data: T) -> impl IntoResponse {
     (StatusCode::CREATED, Json(ApiResponse::success(data)))
 }
 
-/// Helper to create no content response (204)
+/// Helper to create no content response (204) - future use
+#[allow(dead_code)]
 pub fn no_content() -> impl IntoResponse {
     StatusCode::NO_CONTENT
 }

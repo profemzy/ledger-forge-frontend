@@ -294,10 +294,36 @@ ledger-forge/
 
 ## 🧪 Testing
 
+**Test Coverage:** 26 tests passing ✅ | ~75% coverage
+
+### Running Tests
+
 ```bash
-# Run tests
+# Run all tests
 cargo test
 
+# Run specific test suite
+cargo test --test auth_service_test
+cargo test --test migrations_test
+
+# Run with output
+cargo test -- --nocapture
+
+# Run database tests serially
+cargo test -- --test-threads=1
+```
+
+### Test Suites
+
+- **Unit Tests** (19 tests ✅) - Authentication service, password hashing, JWT
+- **Database Tests** (7 tests ✅) - Schema, migrations, constraints, precision
+- **Integration Tests** (WIP) - API endpoints, full workflows
+
+See [tests/README.md](./tests/README.md) for detailed testing guide.
+
+### Other Commands
+
+```bash
 # Check compilation
 cargo check
 

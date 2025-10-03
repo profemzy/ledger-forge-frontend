@@ -1,3 +1,4 @@
+#![allow(dead_code)]
 use chrono::{DateTime, NaiveDate, Utc};
 use rust_decimal::Decimal;
 use serde::{Deserialize, Serialize};

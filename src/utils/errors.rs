@@ -22,13 +22,17 @@ pub enum AppError {
     NotFound(String),
     Conflict(String),
 
-    // Business logic errors
+    // Business logic errors (future features)
+    #[allow(dead_code)]
     InsufficientBalance,
+    #[allow(dead_code)]
     UnbalancedTransaction(String),
+    #[allow(dead_code)]
     InvalidAccountType(String),
 
     // Generic errors
     InternalError(String),
+    #[allow(dead_code)]
     BadRequest(String),
 }
 

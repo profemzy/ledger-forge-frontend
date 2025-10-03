@@ -12,10 +12,12 @@ use crate::services::AuthService;
 use crate::utils::AppError;
 
 /// Extension to inject authenticated user into request
+#[allow(dead_code)]
 #[derive(Clone)]
 pub struct AuthUser(pub User);
 
 /// Middleware to validate JWT and inject user into request
+#[allow(dead_code)]
 pub async fn auth_middleware(
     State(auth_service): State<AuthService>,
     State(pool): State<PgPool>,
@@ -49,6 +51,7 @@ pub async fn auth_middleware(
 }
 
 /// Extract authenticated user from request
+#[allow(dead_code)]
 pub async fn extract_auth_user(request: &Request) -> Result<User, AppError> {
     request
         .extensions()
