@@ -4,13 +4,22 @@ use validator::Validate;
 
 use crate::models::{Account, AccountType, CreateAccountRequest, UpdateAccountRequest};
 use crate::utils::{AppError, Result};
+use crate::services::CacheService;
 
 #[derive(Clone)]
-pub struct AccountService;
+pub struct AccountService {
+    cache: CacheService,
+}
 
 impl AccountService {
     pub fn new() -> Self {
-        Self
+        Self {
+            cache: CacheService::default(),
+        }
+    }
+
+    pub fn new_with_cache(cache: CacheService) -> Self {
+        Self { cache }
     }
 
     /// Create a new account
@@ -53,6 +62,8 @@ impl AccountService {
         .bind(req.company_id)
         .fetch_one(pool)
         .await?;
+
+              // Account hierarchy cache invalidation to be implemented later
 
         Ok(account)
     }
@@ -171,6 +182,8 @@ impl AccountService {
             .fetch_one(pool)
             .await?;
 
+            // Account hierarchy cache invalidation to be implemented later
+
         Ok(account)
     }
 
@@ -205,6 +218,8 @@ impl AccountService {
         .bind(id)
         .fetch_one(pool)
         .await?;
+
+          // Account hierarchy cache invalidation to be implemented later
 
         Ok(account)
     }

@@ -9,7 +9,7 @@ use utoipa_swagger_ui::SwaggerUi;
 
 use crate::{
     handlers,
-    services::{AuthService, AccountService, TransactionService},
+    services::{AuthService, AccountService, TransactionService, CacheService},
     utils::HealthResponse
 };
 
@@ -20,6 +20,7 @@ pub struct AppState {
     pub auth_service: AuthService,
     pub account_service: AccountService,
     pub transaction_service: TransactionService,
+    pub cache_service: CacheService,
 }
 
 /// Health check endpoint
@@ -38,20 +39,29 @@ pub async fn health_check(State(state): State<AppState>) -> Json<HealthResponse>
         Err(_) => "unhealthy",
     };
 
+    // Check Redis connectivity
+    let cache_status = match state.cache_service.health_check().await {
+        Ok(true) => "healthy",
+        Ok(false) => "unhealthy",
+        Err(_) => "disconnected",
+    };
+
     Json(HealthResponse {
         status: "ok".to_string(),
         version: env!("CARGO_PKG_VERSION").to_string(),
         database: db_status.to_string(),
+        cache: cache_status.to_string(),
     })
 }
 
 /// Create all application routes
-pub fn create_routes(pool: PgPool, auth_service: AuthService, account_service: AccountService, transaction_service: TransactionService) -> Router {
+pub fn create_routes(pool: PgPool, auth_service: AuthService, account_service: AccountService, transaction_service: TransactionService, cache_service: CacheService) -> Router {
     let app_state = AppState {
         pool,
         auth_service,
         account_service,
         transaction_service,
+        cache_service,
     };
 
     // API routes

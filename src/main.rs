@@ -13,7 +13,7 @@ use tower_http::cors::{Any, CorsLayer};
 use tracing_subscriber::{layer::SubscriberExt, util::SubscriberInitExt};
 
 use crate::routes::create_routes;
-use crate::services::{AuthService, AccountService, TransactionService};
+use crate::services::{AuthService, AccountService, TransactionService, CacheService};
 
 #[tokio::main]
 async fn main() -> anyhow::Result<()> {
@@ -55,10 +55,21 @@ async fn main() -> anyhow::Result<()> {
 
     tracing::info!("✅ Database migrations applied");
 
-    // Initialize services
+    // Get Redis URL from environment
+    let redis_url = env::var("REDIS_URL")
+        .unwrap_or_else(|_| {
+            tracing::info!("REDIS_URL not set, using default localhost:6379");
+            "redis://localhost:6379".to_string()
+        });
+
+    // Initialize cache service
+    let cache_service = CacheService::new(&redis_url)?;
+    tracing::info!("✅ Redis cache service initialized");
+
+    // Initialize services with cache
     let auth_service = AuthService::new(jwt_secret);
-    let account_service = AccountService::new();
-    let transaction_service = TransactionService::new();
+    let account_service = AccountService::new_with_cache(cache_service.clone());
+    let transaction_service = TransactionService::new_with_cache(cache_service.clone());
 
     // Configure CORS
     let cors = CorsLayer::new()
@@ -67,7 +78,7 @@ async fn main() -> anyhow::Result<()> {
         .allow_headers(Any);
 
     // Create application routes
-    let app = create_routes(pool, auth_service, account_service, transaction_service)
+    let app = create_routes(pool, auth_service, account_service, transaction_service, cache_service)
         .layer(cors)
         .layer(tower_http::trace::TraceLayer::new_for_http());
 

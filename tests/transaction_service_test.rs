@@ -2,17 +2,17 @@ use ledger_forge::models::{
     Account, AccountType, CreateAccountRequest, CreateTransactionRequest,
     CreateLineItemRequest, TransactionStatus, JournalType
 };
-use ledger_forge::services::{AccountService, TransactionService};
+use ledger_forge::services::{AccountService, TransactionService, CacheService};
 use rust_decimal::Decimal;
 use chrono::{Utc, NaiveDate};
 use uuid::Uuid;
 
 mod common;
-use common::{cleanup_test_db, setup_test_db};
+use common::{cleanup_test_db, setup_test_db, setup_test_cache_fallback, clear_test_cache};
 
 // Helper function to create a test account
-async fn create_test_account(pool: &sqlx::PgPool, code: &str, name: &str, account_type: AccountType) -> Account {
-    let service = AccountService::new();
+async fn create_test_account(pool: &sqlx::PgPool, cache: &CacheService, code: &str, name: &str, account_type: AccountType) -> Account {
+    let service = AccountService::new_with_cache(cache.clone());
     let req = CreateAccountRequest {
         code: code.to_string(),
         name: name.to_string(),
@@ -29,11 +29,15 @@ async fn test_create_transaction_success() {
     let pool = setup_test_db().await;
     cleanup_test_db(&pool).await;
 
-    // Create test accounts
-    let cash_account = create_test_account(&pool, "1000", "Cash", AccountType::Asset).await;
-    let revenue_account = create_test_account(&pool, "4000", "Sales Revenue", AccountType::Revenue).await;
+    // Setup cache
+    let cache = setup_test_cache_fallback().await;
+    clear_test_cache(&cache).await;
 
-    let service = TransactionService::new();
+    // Create test accounts
+    let cash_account = create_test_account(&pool, &cache, "1000", "Cash", AccountType::Asset).await;
+    let revenue_account = create_test_account(&pool, &cache, "4000", "Sales Revenue", AccountType::Revenue).await;
+
+    let service = TransactionService::new_with_cache(cache.clone());
     let req = CreateTransactionRequest {
         transaction_date: Utc::now().date_naive(),
         description: Some("Test transaction".to_string()),
@@ -65,6 +69,7 @@ async fn test_create_transaction_success() {
     assert_eq!(transaction.line_items.len(), 2);
     assert_eq!(transaction.transaction.journal_type, Some(JournalType::General));
 
+    clear_test_cache(&cache).await;
     cleanup_test_db(&pool).await;
 }
 

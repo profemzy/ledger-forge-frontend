@@ -87,6 +87,8 @@ pub struct HealthResponse {
     pub version: String,
     #[schema(example = "healthy")]
     pub database: String,
+    #[schema(example = "healthy")]
+    pub cache: String,
 }
 
 /// Empty response for successful operations with no data (future use)

@@ -8,13 +8,22 @@ use crate::models::{
     CreateTransactionRequest,
 };
 use crate::utils::{AppError, Result};
+use crate::services::CacheService;
 
 #[derive(Clone)]
-pub struct TransactionService;
+pub struct TransactionService {
+    cache: CacheService,
+}
 
 impl TransactionService {
     pub fn new() -> Self {
-        Self
+        Self {
+            cache: CacheService::default(),
+        }
+    }
+
+    pub fn new_with_cache(cache: CacheService) -> Self {
+        Self { cache }
     }
 
     /// Create a new transaction with line items
@@ -242,6 +251,20 @@ impl TransactionService {
         .fetch_one(pool)
         .await?;
 
+        // Invalidate caches if status affects balances (draft -> posted or posted -> void)
+        if matches!((&current.transaction.status, &new_status),
+                   (TransactionStatus::Draft, TransactionStatus::Posted) |
+                   (TransactionStatus::Posted, TransactionStatus::Void)) {
+
+            // Invalidate account balance caches for all accounts in this transaction
+            for line_item in &current.line_items {
+                self.cache.invalidate_account_balance(line_item.account_id).await?;
+            }
+
+            // Invalidate transaction list caches
+            self.cache.invalidate_transaction_lists().await?;
+        }
+
         Ok(transaction)
     }
 
@@ -275,6 +298,9 @@ impl TransactionService {
         // Commit
         tx.commit().await?;
 
+        // Invalidate transaction list caches (draft deletion doesn't affect balances)
+        self.cache.invalidate_transaction_lists().await?;
+
         Ok(())
     }
 
@@ -296,6 +322,11 @@ impl TransactionService {
 
     /// Get account balance (sum of all posted transactions)
     pub async fn get_account_balance(&self, pool: &PgPool, account_id: Uuid) -> Result<Decimal> {
+        // Try cache first
+        if let Some(cached_balance) = self.cache.get_account_balance(account_id).await? {
+            return Ok(cached_balance);
+        }
+
         self.validate_account_exists(pool, account_id).await?;
 
         let balance = sqlx::query_scalar::<_, Option<Decimal>>(
@@ -310,6 +341,9 @@ impl TransactionService {
         .fetch_one(pool)
         .await?
         .unwrap_or(Decimal::ZERO);
+
+        // Cache the calculated balance (5 minute TTL)
+        self.cache.set_account_balance(account_id, balance).await?;
 
         Ok(balance)
     }
