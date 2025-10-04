@@ -5,9 +5,9 @@ use axum::{
 use serde::Deserialize;
 use uuid::Uuid;
 
-use crate::models::{AccountType, CreateAccountRequest, UpdateAccountRequest};
+use crate::models::{Account, AccountType, CreateAccountRequest, UpdateAccountRequest};
 use crate::routes::AppState;
-use crate::utils::{created, no_content, success, Result};
+use crate::utils::{created, no_content, success, ApiResponse, Result};
 
 /// Query parameters for listing accounts
 #[derive(Debug, Deserialize)]
@@ -21,6 +21,23 @@ pub struct ListAccountsQuery {
 }
 
 /// List all accounts
+#[utoipa::path(
+    get,
+    path = "/api/v1/accounts",
+    tag = "accounts",
+    params(
+        ("account_type" = Option<String>, Query, description = "Filter by account type (Asset, Liability, Equity, Revenue, Expense)"),
+        ("parent_id" = Option<String>, Query, description = "Filter by parent account ID"),
+        ("include_inactive" = Option<bool>, Query, description = "Include inactive accounts")
+    ),
+    responses(
+        (status = 200, description = "List of accounts", body = ApiResponse<Vec<Account>>),
+        (status = 400, description = "Invalid query parameters")
+    ),
+    security(
+        ("bearer_auth" = [])
+    )
+)]
 pub async fn list_accounts(
     State(state): State<AppState>,
     Query(params): Query<ListAccountsQuery>,
@@ -46,6 +63,20 @@ pub async fn list_accounts(
 }
 
 /// Create a new account
+#[utoipa::path(
+    post,
+    path = "/api/v1/accounts",
+    tag = "accounts",
+    request_body = CreateAccountRequest,
+    responses(
+        (status = 201, description = "Account created successfully", body = ApiResponse<Account>),
+        (status = 400, description = "Invalid request data"),
+        (status = 409, description = "Account code already exists")
+    ),
+    security(
+        ("bearer_auth" = [])
+    )
+)]
 pub async fn create_account(
     State(state): State<AppState>,
     Json(req): Json<CreateAccountRequest>,
@@ -55,6 +86,21 @@ pub async fn create_account(
 }
 
 /// Get account by ID
+#[utoipa::path(
+    get,
+    path = "/api/v1/accounts/{id}",
+    tag = "accounts",
+    params(
+        ("id" = Uuid, Path, description = "Account ID")
+    ),
+    responses(
+        (status = 200, description = "Account details", body = ApiResponse<Account>),
+        (status = 404, description = "Account not found")
+    ),
+    security(
+        ("bearer_auth" = [])
+    )
+)]
 pub async fn get_account(
     State(state): State<AppState>,
     Path(id): Path<Uuid>,
@@ -64,6 +110,23 @@ pub async fn get_account(
 }
 
 /// Update account
+#[utoipa::path(
+    put,
+    path = "/api/v1/accounts/{id}",
+    tag = "accounts",
+    params(
+        ("id" = Uuid, Path, description = "Account ID")
+    ),
+    request_body = UpdateAccountRequest,
+    responses(
+        (status = 200, description = "Account updated successfully", body = ApiResponse<Account>),
+        (status = 400, description = "Invalid request data"),
+        (status = 404, description = "Account not found")
+    ),
+    security(
+        ("bearer_auth" = [])
+    )
+)]
 pub async fn update_account(
     State(state): State<AppState>,
     Path(id): Path<Uuid>,
@@ -77,6 +140,22 @@ pub async fn update_account(
 }
 
 /// Deactivate account (soft delete)
+#[utoipa::path(
+    delete,
+    path = "/api/v1/accounts/{id}",
+    tag = "accounts",
+    params(
+        ("id" = Uuid, Path, description = "Account ID")
+    ),
+    responses(
+        (status = 204, description = "Account deactivated successfully"),
+        (status = 400, description = "Cannot deactivate account with transactions"),
+        (status = 404, description = "Account not found")
+    ),
+    security(
+        ("bearer_auth" = [])
+    )
+)]
 pub async fn deactivate_account(
     State(state): State<AppState>,
     Path(id): Path<Uuid>,
@@ -89,6 +168,21 @@ pub async fn deactivate_account(
 }
 
 /// Get account hierarchy (parent and children)
+#[utoipa::path(
+    get,
+    path = "/api/v1/accounts/{id}/hierarchy",
+    tag = "accounts",
+    params(
+        ("id" = Uuid, Path, description = "Account ID")
+    ),
+    responses(
+        (status = 200, description = "Account hierarchy details"),
+        (status = 404, description = "Account not found")
+    ),
+    security(
+        ("bearer_auth" = [])
+    )
+)]
 pub async fn get_account_hierarchy(
     State(state): State<AppState>,
     Path(id): Path<Uuid>,

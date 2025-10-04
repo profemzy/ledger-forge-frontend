@@ -15,7 +15,27 @@ use crate::utils::{ApiResponse, HealthResponse};
 #[derive(OpenApi)]
 #[openapi(
     paths(
+        // Health
         crate::routes::health_check,
+        // Auth
+        crate::handlers::auth::register,
+        crate::handlers::auth::login,
+        crate::handlers::auth::refresh_token,
+        crate::handlers::auth::me,
+        // Accounts
+        crate::handlers::account::list_accounts,
+        crate::handlers::account::create_account,
+        crate::handlers::account::get_account,
+        crate::handlers::account::update_account,
+        crate::handlers::account::deactivate_account,
+        crate::handlers::account::get_account_hierarchy,
+        // Transactions
+        crate::handlers::transaction::list_transactions,
+        crate::handlers::transaction::create_transaction,
+        crate::handlers::transaction::get_transaction,
+        crate::handlers::transaction::update_transaction_status,
+        crate::handlers::transaction::delete_transaction,
+        crate::handlers::transaction::get_account_balance,
     ),
     components(
         schemas(
@@ -49,6 +69,10 @@ use crate::utils::{ApiResponse, HealthResponse};
             CreateTransactionRequest,
             CreateLineItemRequest,
             TransactionWithLineItems,
+            // Additional request/response types
+            crate::handlers::auth::RefreshTokenRequest,
+            crate::handlers::auth::TokenResponse,
+            crate::handlers::transaction::UpdateStatusRequest,
         )
     ),
     modifiers(&SecurityAddon),

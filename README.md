@@ -24,7 +24,7 @@ Replace QuickBooks with a bespoke accounting platform that offers:
 - ✅ 6 new transaction endpoints (17 total endpoints live!)
 - ✅ Account balance calculation
 - ✅ 15 comprehensive unit tests
-- ✅ Progress: 80% → 100% ✅
+- ✅ Progress: 100% ✅
 
 ### Progress Checklist
 - [x] Project initialization with Axum framework
@@ -37,7 +37,7 @@ Replace QuickBooks with a bespoke accounting platform that offers:
 - [x] **User registration & login**
 - [x] **Axum server with CORS & logging**
 - [x] **Chart of Accounts API (COMPLETE)**
-- [x] **Transaction Engine API (COMPLETE)** ✅ NEW!
+- [x] **Transaction Engine API (COMPLETE)** 
 
 ## 🏗️ Technology Stack
 

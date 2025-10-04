@@ -1,10 +1,22 @@
 use axum::{extract::State, Json};
 
-use crate::models::{AuthResponse, CreateUserRequest, LoginRequest, UserResponse};
+#[allow(unused_imports)]
+use crate::models::{AuthResponse, CreateUserRequest, LoginRequest, User, UserResponse};
 use crate::routes::AppState;
 use crate::utils::{created, success, ApiResponse, AppError, Result};
 
 /// Register a new user
+#[utoipa::path(
+    post,
+    path = "/api/v1/auth/register",
+    tag = "auth",
+    request_body = CreateUserRequest,
+    responses(
+        (status = 201, description = "User registered successfully", body = ApiResponse<AuthResponse>),
+        (status = 400, description = "Invalid request data"),
+        (status = 409, description = "User already exists")
+    )
+)]
 pub async fn register(
     State(state): State<AppState>,
     Json(req): Json<CreateUserRequest>,
@@ -27,6 +39,17 @@ pub async fn register(
 }
 
 /// Login user
+#[utoipa::path(
+    post,
+    path = "/api/v1/auth/login",
+    tag = "auth",
+    request_body = LoginRequest,
+    responses(
+        (status = 200, description = "Login successful", body = ApiResponse<AuthResponse>),
+        (status = 401, description = "Invalid credentials"),
+        (status = 404, description = "User not found")
+    )
+)]
 pub async fn login(
     State(state): State<AppState>,
     Json(req): Json<LoginRequest>,
@@ -49,6 +72,16 @@ pub async fn login(
 }
 
 /// Refresh access token using refresh token
+#[utoipa::path(
+    post,
+    path = "/api/v1/auth/refresh",
+    tag = "auth",
+    request_body = RefreshTokenRequest,
+    responses(
+        (status = 200, description = "Token refreshed successfully", body = ApiResponse<TokenResponse>),
+        (status = 401, description = "Invalid or expired refresh token")
+    )
+)]
 pub async fn refresh_token(
     State(state): State<AppState>,
     Json(payload): Json<RefreshTokenRequest>,
@@ -71,6 +104,18 @@ pub async fn refresh_token(
 }
 
 /// Get current user profile (requires authentication)
+#[utoipa::path(
+    get,
+    path = "/api/v1/auth/me",
+    tag = "auth",
+    responses(
+        (status = 200, description = "Current user profile retrieved", body = ApiResponse<UserResponse>),
+        (status = 401, description = "Unauthorized - missing or invalid token")
+    ),
+    security(
+        ("bearer_auth" = [])
+    )
+)]
 pub async fn me(
     State(state): State<AppState>,
     request: axum::http::Request<axum::body::Body>,
@@ -98,12 +143,12 @@ pub async fn me(
     Ok(success(user.into()))
 }
 
-#[derive(serde::Deserialize)]
+#[derive(serde::Deserialize, utoipa::ToSchema)]
 pub struct RefreshTokenRequest {
     pub refresh_token: String,
 }
 
-#[derive(serde::Serialize)]
+#[derive(serde::Serialize, utoipa::ToSchema)]
 pub struct TokenResponse {
     pub access_token: String,
 }
