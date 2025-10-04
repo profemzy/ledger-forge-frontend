@@ -4,9 +4,15 @@ use axum::{
     Json,
 };
 use serde::Serialize;
+use utoipa::ToSchema;
 
 /// Standard success response wrapper
-#[derive(Debug, Serialize)]
+#[derive(Debug, Serialize, ToSchema)]
+#[schema(example = json!({
+    "success": true,
+    "data": {},
+    "message": null
+}))]
 pub struct ApiResponse<T: Serialize> {
     pub success: bool,
     pub data: T,
@@ -73,10 +79,13 @@ impl<T: Serialize> IntoResponse for PaginatedResponse<T> {
 }
 
 /// Health check response
-#[derive(Debug, Serialize)]
+#[derive(Debug, Serialize, ToSchema)]
 pub struct HealthResponse {
+    #[schema(example = "ok")]
     pub status: String,
+    #[schema(example = "0.1.0")]
     pub version: String,
+    #[schema(example = "healthy")]
     pub database: String,
 }
 

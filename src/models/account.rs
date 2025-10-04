@@ -2,10 +2,11 @@
 use chrono::{DateTime, Utc};
 use serde::{Deserialize, Serialize};
 use sqlx::FromRow;
+use utoipa::ToSchema;
 use uuid::Uuid;
 use validator::Validate;
 
-#[derive(Debug, Serialize, Deserialize, FromRow, Clone)]
+#[derive(Debug, Serialize, Deserialize, FromRow, Clone, ToSchema)]
 pub struct Account {
     pub id: Uuid,
     pub code: String,
@@ -18,7 +19,7 @@ pub struct Account {
     pub updated_at: DateTime<Utc>,
 }
 
-#[derive(Debug, Serialize, Deserialize, Clone, sqlx::Type, PartialEq)]
+#[derive(Debug, Serialize, Deserialize, Clone, sqlx::Type, PartialEq, ToSchema)]
 #[sqlx(type_name = "varchar", rename_all = "PascalCase")]
 pub enum AccountType {
     Asset,
@@ -40,22 +41,26 @@ impl std::fmt::Display for AccountType {
     }
 }
 
-#[derive(Debug, Deserialize, Validate)]
+#[derive(Debug, Deserialize, Validate, ToSchema)]
 pub struct CreateAccountRequest {
     #[validate(length(min = 1, max = 50))]
+    #[schema(example = "1000")]
     pub code: String,
 
     #[validate(length(min = 1, max = 255))]
+    #[schema(example = "Cash")]
     pub name: String,
 
+    #[schema(example = "Asset")]
     pub account_type: AccountType,
     pub parent_account_id: Option<Uuid>,
     pub company_id: Option<Uuid>,
 }
 
-#[derive(Debug, Deserialize, Validate)]
+#[derive(Debug, Deserialize, Validate, ToSchema)]
 pub struct UpdateAccountRequest {
     #[validate(length(min = 1, max = 255))]
+    #[schema(example = "Petty Cash")]
     pub name: Option<String>,
     pub is_active: Option<bool>,
 }

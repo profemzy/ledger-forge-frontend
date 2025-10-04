@@ -3,10 +3,11 @@ use chrono::{DateTime, NaiveDate, Utc};
 use rust_decimal::Decimal;
 use serde::{Deserialize, Serialize};
 use sqlx::FromRow;
+use utoipa::ToSchema;
 use uuid::Uuid;
 use validator::Validate;
 
-#[derive(Debug, Serialize, Deserialize, FromRow, Clone)]
+#[derive(Debug, Serialize, Deserialize, FromRow, Clone, ToSchema)]
 pub struct Transaction {
     pub id: Uuid,
     pub transaction_date: NaiveDate,
@@ -21,7 +22,7 @@ pub struct Transaction {
     pub updated_at: DateTime<Utc>,
 }
 
-#[derive(Debug, Serialize, Deserialize, Clone, sqlx::Type, PartialEq)]
+#[derive(Debug, Serialize, Deserialize, Clone, sqlx::Type, PartialEq, ToSchema)]
 #[sqlx(type_name = "varchar", rename_all = "PascalCase")]
 pub enum JournalType {
     General,
@@ -32,7 +33,18 @@ pub enum JournalType {
     Purchases,
 }
 
-#[derive(Debug, Serialize, Deserialize, Clone, sqlx::Type, PartialEq)]
+impl std::fmt::Display for JournalType {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        match self {
+            JournalType::General => write!(f, "General"),
+            JournalType::Sales => write!(f, "Sales"),
+            JournalType::CashReceipts => write!(f, "Cash Receipts"),
+            JournalType::Purchases => write!(f, "Purchases"),
+        }
+    }
+}
+
+#[derive(Debug, Serialize, Deserialize, Clone, sqlx::Type, PartialEq, ToSchema)]
 #[sqlx(type_name = "varchar", rename_all = "lowercase")]
 pub enum TransactionStatus {
     #[serde(rename = "draft")]
@@ -43,7 +55,17 @@ pub enum TransactionStatus {
     Void,
 }
 
-#[derive(Debug, Serialize, Deserialize, FromRow, Clone)]
+impl std::fmt::Display for TransactionStatus {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        match self {
+            TransactionStatus::Draft => write!(f, "draft"),
+            TransactionStatus::Posted => write!(f, "posted"),
+            TransactionStatus::Void => write!(f, "void"),
+        }
+    }
+}
+
+#[derive(Debug, Serialize, Deserialize, FromRow, Clone, ToSchema)]
 pub struct TransactionLineItem {
     pub id: Uuid,
     pub transaction_id: Uuid,
@@ -55,10 +77,13 @@ pub struct TransactionLineItem {
     pub updated_at: DateTime<Utc>,
 }
 
-#[derive(Debug, Serialize, Deserialize, Validate)]
+#[derive(Debug, Serialize, Deserialize, Validate, ToSchema)]
 pub struct CreateTransactionRequest {
+    #[schema(example = "2025-10-04")]
     pub transaction_date: NaiveDate,
+    #[schema(example = "Service rendered to customer")]
     pub description: Option<String>,
+    #[schema(example = "INV-001")]
     pub reference_number: Option<String>,
     pub contact_id: Option<Uuid>,
     pub company_id: Option<Uuid>,
@@ -69,13 +94,16 @@ pub struct CreateTransactionRequest {
     pub line_items: Vec<CreateLineItemRequest>,
 }
 
-#[derive(Debug, Serialize, Deserialize, Clone)]
+#[derive(Debug, Serialize, Deserialize, Clone, ToSchema)]
 pub struct CreateLineItemRequest {
     pub account_id: Uuid,
+    #[schema(example = "Cash received")]
     pub description: Option<String>,
 
+    #[schema(example = 500.00)]
     pub debit_amount: Option<Decimal>,
 
+    #[schema(example = 500.00)]
     pub credit_amount: Option<Decimal>,
 }
 
@@ -118,7 +146,7 @@ fn validate_balanced_entry(line_items: &[CreateLineItemRequest]) -> Result<(), v
     Ok(())
 }
 
-#[derive(Debug, Serialize)]
+#[derive(Debug, Serialize, ToSchema)]
 pub struct TransactionWithLineItems {
     #[serde(flatten)]
     pub transaction: Transaction,

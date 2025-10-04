@@ -51,3 +51,9 @@ htmlcov/
 # Documentation builds
 docs/_build/
 site/
+
+# Temporary test files
+*.tmp
+/tmp/
+test_*.json
+scripts/output/

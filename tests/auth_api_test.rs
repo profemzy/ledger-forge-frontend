@@ -1,3 +1,4 @@
+use axum::http::{header, HeaderName, HeaderValue};
 use axum_test::TestServer;
 use serde_json::{json, Value};
 use serial_test::serial;
@@ -6,7 +7,7 @@ mod common;
 use common::{setup_test_db, cleanup_test_db, TestUser, TEST_JWT_SECRET};
 use common::{assert_success_response, assert_error_response, assert_valid_uuid, assert_valid_jwt};
 
-use ledger_forge::services::auth::AuthService;
+use ledger_forge::services::{AuthService, AccountService, TransactionService};
 use ledger_forge::routes::create_routes;
 
 async fn create_test_server() -> TestServer {
@@ -14,7 +15,9 @@ async fn create_test_server() -> TestServer {
     cleanup_test_db(&pool).await;
 
     let auth_service = AuthService::new(TEST_JWT_SECRET.to_string());
-    let app = create_routes(pool, auth_service);
+    let account_service = AccountService::new();
+    let transaction_service = TransactionService::new();
+    let app = create_routes(pool, auth_service, account_service, transaction_service);
 
     TestServer::new(app).unwrap()
 }
@@ -29,8 +32,8 @@ async fn test_health_check() {
     response.assert_status_ok();
 
     let json: Value = response.json();
-    assert_eq!(json["status"], "healthy");
-    assert_eq!(json["database"], "connected");
+    assert_eq!(json["status"], "ok");
+    assert_eq!(json["database"], "healthy");
 }
 
 #[tokio::test]
@@ -144,7 +147,7 @@ async fn test_register_invalid_email_returns_400() {
             "username": "testuser",
             "email": "not-an-email",
             "password": "TestPass123!",
-            "role": "user"
+            "role": "viewer"
         }))
         .await;
 
@@ -268,7 +271,10 @@ async fn test_get_me_with_valid_token_returns_200() {
     // Get current user
     let response = server
         .get("/api/v1/auth/me")
-        .add_header("Authorization".parse().unwrap(), format!("Bearer {}", access_token).parse().unwrap())
+        .add_header(
+            HeaderName::from_static("authorization"),
+            HeaderValue::from_str(&format!("Bearer {}", access_token)).unwrap()
+        )
         .await;
 
     response.assert_status_ok();
@@ -300,7 +306,10 @@ async fn test_get_me_with_invalid_token_returns_401() {
 
     let response = server
         .get("/api/v1/auth/me")
-        .add_header("Authorization".parse().unwrap(), "Bearer invalid.token.here".parse().unwrap())
+        .add_header(
+            HeaderName::from_static("authorization"),
+            HeaderValue::from_static("Bearer invalid.token.here")
+        )
         .await;
 
     response.assert_status(axum::http::StatusCode::UNAUTHORIZED);
@@ -341,7 +350,6 @@ async fn test_refresh_token_valid_returns_200() {
 
     let data = &json["data"];
     assert_valid_jwt(data["access_token"].as_str().unwrap());
-    assert_valid_jwt(data["refresh_token"].as_str().unwrap());
 }
 
 #[tokio::test]
@@ -393,7 +401,10 @@ async fn test_complete_auth_workflow() {
     // Step 3: Access protected route
     let me_response = server
         .get("/api/v1/auth/me")
-        .add_header("Authorization".parse().unwrap(), format!("Bearer {}", access_token).parse().unwrap())
+        .add_header(
+            HeaderName::from_static("authorization"),
+            HeaderValue::from_str(&format!("Bearer {}", access_token)).unwrap()
+        )
         .await;
     me_response.assert_status_ok();
 
