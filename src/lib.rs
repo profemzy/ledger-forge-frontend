@@ -7,3 +7,4 @@ pub mod middleware;
 pub mod routes;
 pub mod utils;
 pub mod docs;
+pub mod seed;
