@@ -47,8 +47,7 @@ utoipa = { version = "5", features = ["axum_extras", "chrono", "uuid", "decimal"
 utoipa-swagger-ui = { version = "9", features = ["axum"] }
 
 # Redis Caching
-redis = { version = "0.27", features = ["tokio-comp"] }
-serde-redis = "0.14"
+redis = { version = "0.27", features = ["tokio-comp", "json"] }
 
 [dev-dependencies]
 # Testing framework

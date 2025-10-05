@@ -63,7 +63,10 @@ impl AccountService {
         .fetch_one(pool)
         .await?;
 
-              // Account hierarchy cache invalidation to be implemented later
+        // Invalidate parent's hierarchy cache if this account has a parent
+        if let Some(parent_id) = account.parent_account_id {
+            let _ = self.cache.invalidate_account_hierarchy(parent_id).await;
+        }
 
         Ok(account)
     }
@@ -121,6 +124,16 @@ impl AccountService {
 
     /// Get account by ID
     pub async fn get_account_by_id(&self, pool: &PgPool, id: Uuid) -> Result<Account> {
+        // Try to get from cache first
+        if let Ok(Some(cached_json)) = self.cache.get_account(id).await {
+            if let Ok(account) = serde_json::from_str::<Account>(&cached_json) {
+                tracing::debug!("Cache hit for account {}", id);
+                return Ok(account);
+            }
+        }
+
+        // Cache miss - fetch from database
+        tracing::debug!("Cache miss for account {}", id);
         let account = sqlx::query_as::<_, Account>(
             r#"
             SELECT id, code, name, account_type, parent_account_id, is_active, company_id, created_at, updated_at
@@ -132,6 +145,11 @@ impl AccountService {
         .fetch_optional(pool)
         .await?
         .ok_or_else(|| AppError::NotFound(format!("Account with id {} not found", id)))?;
+
+        // Cache the result
+        if let Ok(account_json) = serde_json::to_string(&account) {
+            let _ = self.cache.set_account(id, &account_json).await;
+        }
 
         Ok(account)
     }
@@ -182,7 +200,13 @@ impl AccountService {
             .fetch_one(pool)
             .await?;
 
-            // Account hierarchy cache invalidation to be implemented later
+        // Invalidate all caches for this account
+        let _ = self.cache.invalidate_all_account_caches(id).await;
+
+        // Invalidate parent's hierarchy cache if this account has a parent
+        if let Some(parent_id) = account.parent_account_id {
+            let _ = self.cache.invalidate_account_hierarchy(parent_id).await;
+        }
 
         Ok(account)
     }
@@ -219,13 +243,29 @@ impl AccountService {
         .fetch_one(pool)
         .await?;
 
-          // Account hierarchy cache invalidation to be implemented later
+        // Invalidate all caches for this account
+        let _ = self.cache.invalidate_all_account_caches(id).await;
+
+        // Invalidate parent's hierarchy cache if this account has a parent
+        if let Some(parent_id) = account.parent_account_id {
+            let _ = self.cache.invalidate_account_hierarchy(parent_id).await;
+        }
 
         Ok(account)
     }
 
     /// Get account hierarchy (parent and children)
     pub async fn get_account_hierarchy(&self, pool: &PgPool, id: Uuid) -> Result<AccountHierarchy> {
+        // Try to get from cache first
+        if let Ok(Some(cached_json)) = self.cache.get_account_hierarchy(id).await {
+            if let Ok(hierarchy) = serde_json::from_str::<AccountHierarchy>(&cached_json) {
+                tracing::debug!("Cache hit for account hierarchy {}", id);
+                return Ok(hierarchy);
+            }
+        }
+
+        // Cache miss - fetch from database
+        tracing::debug!("Cache miss for account hierarchy {}", id);
         let account = self.get_account_by_id(pool, id).await?;
 
         // Get parent if exists
@@ -248,15 +288,22 @@ impl AccountService {
         .fetch_all(pool)
         .await?;
 
-        Ok(AccountHierarchy {
+        let hierarchy = AccountHierarchy {
             account,
             parent,
             children,
-        })
+        };
+
+        // Cache the result
+        if let Ok(hierarchy_json) = serde_json::to_string(&hierarchy) {
+            let _ = self.cache.set_account_hierarchy(id, &hierarchy_json).await;
+        }
+
+        Ok(hierarchy)
     }
 }
 
-#[derive(Debug, serde::Serialize)]
+#[derive(Debug, serde::Serialize, serde::Deserialize)]
 pub struct AccountHierarchy {
     pub account: Account,
     pub parent: Option<Box<Account>>,

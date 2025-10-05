@@ -9,6 +9,8 @@ use crate::models::{
     // Transaction models
     Transaction, TransactionLineItem, TransactionStatus, JournalType,
     CreateTransactionRequest, CreateLineItemRequest, TransactionWithLineItems,
+    // Contact models
+    Contact, ContactType, CreateContactRequest, UpdateContactRequest,
 };
 use crate::utils::{ApiResponse, HealthResponse};
 
@@ -36,6 +38,15 @@ use crate::utils::{ApiResponse, HealthResponse};
         crate::handlers::transaction::update_transaction_status,
         crate::handlers::transaction::delete_transaction,
         crate::handlers::transaction::get_account_balance,
+        // Contacts
+        crate::handlers::contact::list_contacts,
+        crate::handlers::contact::create_contact,
+        crate::handlers::contact::get_contact,
+        crate::handlers::contact::update_contact,
+        crate::handlers::contact::delete_contact,
+        crate::handlers::contact::get_customers,
+        crate::handlers::contact::get_vendors,
+        crate::handlers::contact::get_employees,
     ),
     components(
         schemas(
@@ -48,6 +59,8 @@ use crate::utils::{ApiResponse, HealthResponse};
             ApiResponse<Vec<Transaction>>,
             ApiResponse<Transaction>,
             ApiResponse<TransactionWithLineItems>,
+            ApiResponse<Vec<Contact>>,
+            ApiResponse<Contact>,
             HealthResponse,
             // User types
             User,
@@ -69,6 +82,11 @@ use crate::utils::{ApiResponse, HealthResponse};
             CreateTransactionRequest,
             CreateLineItemRequest,
             TransactionWithLineItems,
+            // Contact types
+            Contact,
+            ContactType,
+            CreateContactRequest,
+            UpdateContactRequest,
             // Additional request/response types
             crate::handlers::auth::RefreshTokenRequest,
             crate::handlers::auth::TokenResponse,
@@ -81,6 +99,7 @@ use crate::utils::{ApiResponse, HealthResponse};
         (name = "auth", description = "Authentication endpoints"),
         (name = "accounts", description = "Chart of Accounts management"),
         (name = "transactions", description = "Transaction management with double-entry bookkeeping"),
+        (name = "contacts", description = "Contact management (Customers, Vendors, Employees)"),
     ),
     info(
         title = "LedgerForge API",

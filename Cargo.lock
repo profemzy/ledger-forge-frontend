@@ -1432,11 +1432,10 @@ dependencies = [
  "dotenvy",
  "fake",
  "jsonwebtoken",
- "redis 0.27.6",
+ "redis",
  "reqwest",
  "rust_decimal",
  "serde",
- "serde-redis",
  "serde_json",
  "serial_test",
  "sqlx",
@@ -2081,21 +2080,6 @@ dependencies = [
 
 [[package]]
 name = "redis"
-version = "0.24.0"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "c580d9cbbe1d1b479e8d67cf9daf6a62c957e6846048408b80b43ac3f6af84cd"
-dependencies = [
- "combine",
- "itoa",
- "percent-encoding",
- "ryu",
- "sha1_smol",
- "socket2 0.4.10",
- "url",
-]
-
-[[package]]
-name = "redis"
 version = "0.27.6"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "09d8f99a4090c89cc489a94833c901ead69bfbf3877b4867d5482e321ee875bc"
@@ -2111,6 +2095,8 @@ dependencies = [
  "percent-encoding",
  "pin-project-lite",
  "ryu",
+ "serde",
+ "serde_json",
  "sha1_smol",
  "socket2 0.5.10",
  "tokio",
@@ -2487,16 +2473,6 @@ dependencies = [
 ]
 
 [[package]]
-name = "serde-redis"
-version = "0.14.0"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "e2de4a9aae36db9b30ba139b9e7b4edfc424494dbe6b40073797b8d92bb5bae6"
-dependencies = [
- "redis 0.24.0",
- "serde",
-]
-
-[[package]]
 name = "serde_core"
 version = "1.0.228"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -2676,16 +2652,6 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "67b1b7a3b5fe4f1376887184045fcf45c69e92af734b7aaddc05fb777b6fbd03"
 dependencies = [
  "serde",
-]
-
-[[package]]
-name = "socket2"
-version = "0.4.10"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "9f7916fc008ca5542385b89a3d3ce689953c143e9304a9bf8beec1de48994c0d"
-dependencies = [
- "libc",
- "winapi",
 ]
 
 [[package]]
@@ -3733,22 +3699,6 @@ dependencies = [
 ]
 
 [[package]]
-name = "winapi"
-version = "0.3.9"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "5c839a674fcd7a98952e593242ea400abe93992746761e38641405d28b00f419"
-dependencies = [
- "winapi-i686-pc-windows-gnu",
- "winapi-x86_64-pc-windows-gnu",
-]
-
-[[package]]
-name = "winapi-i686-pc-windows-gnu"
-version = "0.4.0"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "ac3b87c63620426dd9b991e5ce0329eff545bccbbb34f3be09ff6fb6ab51b7b6"
-
-[[package]]
 name = "winapi-util"
 version = "0.1.11"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -3756,12 +3706,6 @@ checksum = "c2a7b1c03c876122aa43f3020e6c3c3ee5c05081c9a00739faf7503aeba10d22"
 dependencies = [
  "windows-sys 0.61.1",
 ]
-
-[[package]]
-name = "winapi-x86_64-pc-windows-gnu"
-version = "0.4.0"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "712e227841d057c1ee1cd2fb22fa7e5a5461ae8e48fa2ca79ec42cfc1931183f"
 
 [[package]]
 name = "windows-core"

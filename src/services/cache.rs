@@ -142,6 +142,66 @@ impl CacheService {
     pub async fn invalidate_transaction_lists(&self) -> Result<()> {
         self.delete_pattern("transactions:list:*").await.map(|_| ())
     }
+
+    // === Account Hierarchy Caching ===
+
+    /// Get cached account hierarchy
+    pub async fn get_account_hierarchy(&self, account_id: Uuid) -> Result<Option<String>> {
+        let key = format!("account:hierarchy:{}", account_id);
+        self.get(&key).await
+    }
+
+    /// Set cached account hierarchy
+    pub async fn set_account_hierarchy(&self, account_id: Uuid, hierarchy: &str) -> Result<()> {
+        let key = format!("account:hierarchy:{}", account_id);
+        // 30 minute TTL for account hierarchies (they change less frequently)
+        self.set_with_ttl(&key, &hierarchy, 1800).await
+    }
+
+    /// Invalidate account hierarchy cache
+    pub async fn invalidate_account_hierarchy(&self, account_id: Uuid) -> Result<()> {
+        let key = format!("account:hierarchy:{}", account_id);
+        self.delete(&key).await
+    }
+
+    /// Invalidate all account hierarchies (when structure changes)
+    /// Used for bulk operations or data migrations
+    #[allow(dead_code)]
+    pub async fn invalidate_all_account_hierarchies(&self) -> Result<()> {
+        self.delete_pattern("account:hierarchy:*").await.map(|_| ())
+    }
+
+    // === Account Data Caching ===
+
+    /// Get cached account
+    pub async fn get_account(&self, account_id: Uuid) -> Result<Option<String>> {
+        let key = format!("account:data:{}", account_id);
+        self.get(&key).await
+    }
+
+    /// Set cached account
+    pub async fn set_account(&self, account_id: Uuid, account: &str) -> Result<()> {
+        let key = format!("account:data:{}", account_id);
+        // 10 minute TTL for account data
+        self.set_with_ttl(&key, &account, 600).await
+    }
+
+    /// Invalidate account data
+    pub async fn invalidate_account(&self, account_id: Uuid) -> Result<()> {
+        let key = format!("account:data:{}", account_id);
+        self.delete(&key).await
+    }
+
+    /// Invalidate all account caches (data, hierarchy, balance)
+    pub async fn invalidate_all_account_caches(&self, account_id: Uuid) -> Result<()> {
+        // Invalidate account data
+        self.invalidate_account(account_id).await?;
+        // Invalidate account hierarchy
+        self.invalidate_account_hierarchy(account_id).await?;
+        // Invalidate account balance
+        self.invalidate_account_balance(account_id).await?;
+        Ok(())
+    }
 }
 
 impl Default for CacheService {

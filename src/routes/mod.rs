@@ -9,7 +9,7 @@ use utoipa_swagger_ui::SwaggerUi;
 
 use crate::{
     handlers,
-    services::{AuthService, AccountService, TransactionService, CacheService},
+    services::{AuthService, AccountService, TransactionService, ContactService, CacheService},
     utils::HealthResponse
 };
 
@@ -20,6 +20,7 @@ pub struct AppState {
     pub auth_service: AuthService,
     pub account_service: AccountService,
     pub transaction_service: TransactionService,
+    pub contact_service: ContactService,
     pub cache_service: CacheService,
 }
 
@@ -55,12 +56,13 @@ pub async fn health_check(State(state): State<AppState>) -> Json<HealthResponse>
 }
 
 /// Create all application routes
-pub fn create_routes(pool: PgPool, auth_service: AuthService, account_service: AccountService, transaction_service: TransactionService, cache_service: CacheService) -> Router {
+pub fn create_routes(pool: PgPool, auth_service: AuthService, account_service: AccountService, transaction_service: TransactionService, contact_service: ContactService, cache_service: CacheService) -> Router {
     let app_state = AppState {
         pool,
         auth_service,
         account_service,
         transaction_service,
+        contact_service,
         cache_service,
     };
 
@@ -86,6 +88,15 @@ pub fn create_routes(pool: PgPool, auth_service: AuthService, account_service: A
         .route("/api/v1/transactions/{id}", get(handlers::get_transaction))
         .route("/api/v1/transactions/{id}/status", put(handlers::update_transaction_status))
         .route("/api/v1/transactions/{id}", delete(handlers::delete_transaction))
+        // Contact routes
+        .route("/api/v1/contacts", get(handlers::list_contacts))
+        .route("/api/v1/contacts", post(handlers::create_contact))
+        .route("/api/v1/contacts/customers", get(handlers::get_customers))
+        .route("/api/v1/contacts/vendors", get(handlers::get_vendors))
+        .route("/api/v1/contacts/employees", get(handlers::get_employees))
+        .route("/api/v1/contacts/{id}", get(handlers::get_contact))
+        .route("/api/v1/contacts/{id}", put(handlers::update_contact))
+        .route("/api/v1/contacts/{id}", delete(handlers::delete_contact))
         .with_state(app_state);
 
     // Combine all routes including Swagger UI
