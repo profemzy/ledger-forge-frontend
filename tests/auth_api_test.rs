@@ -1,4 +1,4 @@
-use axum::http::{header, HeaderName, HeaderValue};
+use axum::http::{HeaderName, HeaderValue};
 use axum_test::TestServer;
 use serde_json::{json, Value};
 use serial_test::serial;
@@ -7,17 +7,20 @@ mod common;
 use common::{setup_test_db, cleanup_test_db, TestUser, TEST_JWT_SECRET};
 use common::{assert_success_response, assert_error_response, assert_valid_uuid, assert_valid_jwt};
 
-use ledger_forge::services::{AuthService, AccountService, TransactionService};
+use ledger_forge::services::{AuthService, AccountService, TransactionService, ContactService, InvoiceService, CacheService};
 use ledger_forge::routes::create_routes;
 
 async fn create_test_server() -> TestServer {
     let pool = setup_test_db().await;
     cleanup_test_db(&pool).await;
 
+    let cache_service = CacheService::new("redis://localhost").expect("Failed to create cache service");
     let auth_service = AuthService::new(TEST_JWT_SECRET.to_string());
-    let account_service = AccountService::new();
+    let account_service = AccountService::new_with_cache(cache_service.clone());
     let transaction_service = TransactionService::new();
-    let app = create_routes(pool, auth_service, account_service, transaction_service);
+    let contact_service = ContactService::new();
+    let invoice_service = InvoiceService::new_with_cache(cache_service.clone());
+    let app = create_routes(pool, auth_service, account_service, transaction_service, contact_service, invoice_service, cache_service);
 
     TestServer::new(app).unwrap()
 }

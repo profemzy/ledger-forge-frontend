@@ -3,8 +3,9 @@ use chrono::{NaiveDate, Utc};
 use rust_decimal::Decimal;
 use sqlx::PgPool;
 use uuid::Uuid;
+use std::str::FromStr;
 
-use crate::models::{AccountType, JournalType, TransactionStatus, UserRole};
+use crate::models::{AccountType, JournalType, TransactionStatus, UserRole, InvoiceStatus};
 
 // Helper function to hash passwords
 fn hash_password(password: &str) -> Result<String> {
@@ -26,7 +27,7 @@ fn hash_password(password: &str) -> Result<String> {
 // Helper macro for decimal values
 macro_rules! dec {
     ($val:literal) => {
-        Decimal::from_str_exact(stringify!($val)).unwrap()
+        Decimal::from_str(stringify!($val)).unwrap()
     };
 }
 
@@ -67,6 +68,10 @@ pub async fn seed_database(pool: &PgPool) -> Result<()> {
     // Seed Contacts
     let contact_count = seed_contacts(&mut tx, company_id).await?;
     println!("✅ Seeded {} contacts", contact_count);
+
+    // Seed Invoices
+    let invoice_count = seed_invoices(&mut tx, company_id).await?;
+    println!("✅ Seeded {} invoices", invoice_count);
 
     // Commit transaction
     tx.commit().await?;
@@ -701,4 +706,245 @@ async fn seed_contacts(
     }
 
     Ok(contact_count)
+}
+
+async fn seed_invoices(
+    tx: &mut sqlx::Transaction<'_, sqlx::Postgres>,
+    company_id: Option<Uuid>,
+) -> Result<usize> {
+    let now = Utc::now();
+
+    // First, we need to get the contact IDs for customers
+    let customer_contacts = sqlx::query_as::<_, (Uuid, String)>(
+        "SELECT id, name FROM contacts WHERE contact_type = 'Customer'"
+    )
+    .fetch_all(&mut **tx)
+    .await?;
+
+    if customer_contacts.is_empty() {
+        println!("⚠️  No customer contacts found, skipping invoice seeding");
+        return Ok(0);
+    }
+
+    // Get revenue account IDs for line items
+    let revenue_accounts = sqlx::query_as::<_, (Uuid, String)>(
+        "SELECT id, name FROM chart_of_accounts WHERE account_type = 'Revenue'"
+    )
+    .fetch_all(&mut **tx)
+    .await?;
+
+    if revenue_accounts.is_empty() {
+        println!("⚠️  No revenue accounts found, skipping invoice seeding");
+        return Ok(0);
+    }
+
+    let (customer1_id, _) = &customer_contacts[0];
+    let (customer2_id, _) = if customer_contacts.len() > 1 { &customer_contacts[1] } else { &customer_contacts[0] };
+    let (sales_revenue_id, _) = &revenue_accounts[0];
+    let (service_revenue_id, _) = if revenue_accounts.len() > 1 { &revenue_accounts[1] } else { &revenue_accounts[0] };
+
+    let mut invoice_count = 0;
+
+    // Invoice 1: Sent invoice for ABC Corporation
+    let invoice1_id = Uuid::new_v4();
+    let invoice1_date = NaiveDate::from_ymd_opt(2024, 10, 15).unwrap();
+    let invoice1_due = NaiveDate::from_ymd_opt(2024, 11, 15).unwrap();
+    let invoice1_total = dec!(2500.00);
+
+    // Create invoice header
+    sqlx::query(
+        r#"
+        INSERT INTO invoices (id, invoice_number, customer_id, invoice_date, due_date,
+                              total_amount, balance, status, customer_memo, billing_address,
+                              company_id, created_at, updated_at)
+        VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13)
+        "#,
+    )
+    .bind(invoice1_id)
+    .bind("INV-2024-001")
+    .bind(customer1_id)
+    .bind(invoice1_date)
+    .bind(invoice1_due)
+    .bind(invoice1_total)
+    .bind(invoice1_total)
+    .bind(InvoiceStatus::Sent.to_string())
+    .bind("Monthly consulting services")
+    .bind("123 Customer Ave, Client City, CC 12345")
+    .bind(company_id)
+    .bind(now)
+    .bind(now)
+    .execute(&mut **tx)
+    .await?;
+
+    // Create line items for invoice 1
+    let line_items1 = vec![
+        (1, "Web Development Services", dec!(20), dec!(100.00), Some(dec!(10)), None::<String>, sales_revenue_id), // 20 hours @ $100/hr with 10% discount
+        (2, "SEO Optimization", dec!(10), dec!(75.00), None, None::<String>, service_revenue_id), // 10 hours @ $75/hr
+    ];
+
+    for (line_num, description, qty, unit_price, discount_percent, tax_code, revenue_account_id) in line_items1 {
+        let line_id = Uuid::new_v4();
+        let line_amount = qty * unit_price;
+        let discount_amount = if let Some(discount) = discount_percent {
+            line_amount * (discount / Decimal::new(100, 0))
+        } else {
+            Decimal::ZERO
+        };
+        let final_amount = line_amount - discount_amount;
+
+        sqlx::query(
+            r#"
+            INSERT INTO invoice_line_items (id, invoice_id, line_number, item_description,
+                                          quantity, unit_price, amount, discount_percent,
+                                          tax_code, revenue_account_id, created_at, updated_at)
+            VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12)
+            "#,
+        )
+        .bind(line_id)
+        .bind(invoice1_id)
+        .bind(line_num)
+        .bind(description)
+        .bind(qty)
+        .bind(unit_price)
+        .bind(final_amount)
+        .bind(discount_percent)
+        .bind(tax_code)
+        .bind(revenue_account_id)
+        .bind(now)
+        .bind(now)
+        .execute(&mut **tx)
+        .await?;
+    }
+    invoice_count += 1;
+
+    // Invoice 2: Draft invoice for Tech Services Ltd
+    let invoice2_id = Uuid::new_v4();
+    let invoice2_date = NaiveDate::from_ymd_opt(2024, 10, 20).unwrap();
+    let invoice2_due = NaiveDate::from_ymd_opt(2024, 11, 20).unwrap();
+    let invoice2_total = dec!(3500.00);
+
+    sqlx::query(
+        r#"
+        INSERT INTO invoices (id, invoice_number, customer_id, invoice_date, due_date,
+                              total_amount, balance, status, customer_memo, shipping_address,
+                              company_id, created_at, updated_at)
+        VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13)
+        "#,
+    )
+    .bind(invoice2_id)
+    .bind("INV-2024-002")
+    .bind(customer2_id)
+    .bind(invoice2_date)
+    .bind(invoice2_due)
+    .bind(invoice2_total)
+    .bind(invoice2_total)
+    .bind(InvoiceStatus::Draft.to_string())
+    .bind("Custom software development project")
+    .bind("321 Tech Park, Innovation City, IC 11111")
+    .bind(company_id)
+    .bind(now)
+    .bind(now)
+    .execute(&mut **tx)
+    .await?;
+
+    // Create line items for invoice 2
+    let line_items2 = vec![
+        (1, "Custom API Development", dec!(40), dec!(50.00), None::<rust_decimal::Decimal>, Some("TAX".to_string()), sales_revenue_id), // 40 hours @ $50/hr
+        (2, "Database Design", dec!(15), dec!(60.00), None::<rust_decimal::Decimal>, Some("TAX".to_string()), service_revenue_id), // 15 hours @ $60/hr
+    ];
+
+    for (line_num, description, qty, unit_price, discount_percent, tax_code, revenue_account_id) in line_items2 {
+        let line_id = Uuid::new_v4();
+        let final_amount = qty * unit_price;
+
+        sqlx::query(
+            r#"
+            INSERT INTO invoice_line_items (id, invoice_id, line_number, item_description,
+                                          quantity, unit_price, amount, discount_percent,
+                                          tax_code, revenue_account_id, created_at, updated_at)
+            VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12)
+            "#,
+        )
+        .bind(line_id)
+        .bind(invoice2_id)
+        .bind(line_num)
+        .bind(description)
+        .bind(qty)
+        .bind(unit_price)
+        .bind(final_amount)
+        .bind(discount_percent)
+        .bind(tax_code)
+        .bind(revenue_account_id)
+        .bind(now)
+        .bind(now)
+        .execute(&mut **tx)
+        .await?;
+    }
+    invoice_count += 1;
+
+    // Invoice 3: Overdue invoice for ABC Corporation (created in past)
+    let invoice3_id = Uuid::new_v4();
+    let invoice3_date = NaiveDate::from_ymd_opt(2024, 8, 1).unwrap(); // Past date to make it overdue
+    let invoice3_due = NaiveDate::from_ymd_opt(2024, 8, 31).unwrap(); // Also past
+    let invoice3_total = dec!(1500.00);
+
+    sqlx::query(
+        r#"
+        INSERT INTO invoices (id, invoice_number, customer_id, invoice_date, due_date,
+                              total_amount, balance, status, customer_memo, billing_address,
+                              company_id, created_at, updated_at)
+        VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13)
+        "#,
+    )
+    .bind(invoice3_id)
+    .bind("INV-2024-003")
+    .bind(customer1_id)
+    .bind(invoice3_date)
+    .bind(invoice3_due)
+    .bind(invoice3_total)
+    .bind(invoice3_total)
+    .bind(InvoiceStatus::Overdue.to_string())
+    .bind("Emergency IT support services")
+    .bind("123 Customer Ave, Client City, CC 12345")
+    .bind(company_id)
+    .bind(now)
+    .bind(now)
+    .execute(&mut **tx)
+    .await?;
+
+    // Create line items for invoice 3
+    let line_items3 = vec![
+        (1, "Emergency Server Maintenance", dec!(10), dec!(150.00), None::<rust_decimal::Decimal>, None::<String>, service_revenue_id), // 10 hours @ $150/hr
+    ];
+
+    for (line_num, description, qty, unit_price, discount_percent, tax_code, revenue_account_id) in line_items3 {
+        let line_id = Uuid::new_v4();
+        let final_amount = qty * unit_price;
+
+        sqlx::query(
+            r#"
+            INSERT INTO invoice_line_items (id, invoice_id, line_number, item_description,
+                                          quantity, unit_price, amount, discount_percent,
+                                          tax_code, revenue_account_id, created_at, updated_at)
+            VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12)
+            "#,
+        )
+        .bind(line_id)
+        .bind(invoice3_id)
+        .bind(line_num)
+        .bind(description)
+        .bind(qty)
+        .bind(unit_price)
+        .bind(final_amount)
+        .bind(discount_percent)
+        .bind(tax_code)
+        .bind(revenue_account_id)
+        .bind(now)
+        .bind(now)
+        .execute(&mut **tx)
+        .await?;
+    }
+    invoice_count += 1;
+
+    Ok(invoice_count)
 }

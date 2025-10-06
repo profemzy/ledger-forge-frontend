@@ -5,8 +5,9 @@ use serde::{Deserialize, Serialize};
 use sqlx::FromRow;
 use uuid::Uuid;
 use validator::Validate;
+use utoipa::ToSchema;
 
-#[derive(Debug, Serialize, Deserialize, FromRow, Clone)]
+#[derive(Debug, Serialize, Deserialize, FromRow, Clone, ToSchema)]
 pub struct Payment {
     pub id: Uuid,
     pub quickbooks_id: Option<String>,
@@ -26,7 +27,7 @@ pub struct Payment {
     pub updated_at: DateTime<Utc>,
 }
 
-#[derive(Debug, Serialize, Deserialize, FromRow, Clone)]
+#[derive(Debug, Serialize, Deserialize, FromRow, Clone, ToSchema)]
 pub struct PaymentApplication {
     pub id: Uuid,
     pub payment_id: Uuid,
@@ -35,7 +36,7 @@ pub struct PaymentApplication {
     pub created_at: DateTime<Utc>,
 }
 
-#[derive(Debug, Serialize, Deserialize, FromRow, Clone)]
+#[derive(Debug, Serialize, Deserialize, FromRow, Clone, ToSchema)]
 pub struct BillPayment {
     pub id: Uuid,
     pub quickbooks_id: Option<String>,
@@ -54,7 +55,7 @@ pub struct BillPayment {
     pub updated_at: DateTime<Utc>,
 }
 
-#[derive(Debug, Serialize, Deserialize, FromRow, Clone)]
+#[derive(Debug, Serialize, Deserialize, FromRow, Clone, ToSchema)]
 pub struct BillPaymentApplication {
     pub id: Uuid,
     pub bill_payment_id: Uuid,
@@ -63,7 +64,7 @@ pub struct BillPaymentApplication {
     pub created_at: DateTime<Utc>,
 }
 
-#[derive(Debug, Serialize, Deserialize, Validate)]
+#[derive(Debug, Serialize, Deserialize, Validate, ToSchema)]
 pub struct CreatePaymentRequest {
     pub payment_number: Option<String>,
     pub customer_id: Uuid,
@@ -78,13 +79,13 @@ pub struct CreatePaymentRequest {
     pub applications: Vec<PaymentApplicationRequest>,
 }
 
-#[derive(Debug, Serialize, Deserialize, Clone)]
+#[derive(Debug, Serialize, Deserialize, Clone, ToSchema)]
 pub struct PaymentApplicationRequest {
     pub invoice_id: Uuid,
     pub amount_applied: Decimal,
 }
 
-#[derive(Debug, Serialize, Deserialize, Validate)]
+#[derive(Debug, Serialize, Deserialize, Validate, ToSchema)]
 pub struct CreateBillPaymentRequest {
     pub payment_number: Option<String>,
     pub vendor_id: Uuid,
@@ -99,7 +100,7 @@ pub struct CreateBillPaymentRequest {
     pub applications: Vec<BillPaymentApplicationRequest>,
 }
 
-#[derive(Debug, Serialize, Deserialize, Clone)]
+#[derive(Debug, Serialize, Deserialize, Clone, ToSchema)]
 pub struct BillPaymentApplicationRequest {
     pub bill_id: Uuid,
     pub amount_applied: Decimal,

@@ -5,8 +5,9 @@ use serde::{Deserialize, Serialize};
 use sqlx::FromRow;
 use uuid::Uuid;
 use validator::Validate;
+use utoipa::ToSchema;
 
-#[derive(Debug, Serialize, Deserialize, FromRow, Clone)]
+#[derive(Debug, Serialize, Deserialize, FromRow, Clone, ToSchema)]
 pub struct Invoice {
     pub id: Uuid,
     pub quickbooks_id: Option<String>,
@@ -29,7 +30,7 @@ pub struct Invoice {
     pub updated_at: DateTime<Utc>,
 }
 
-#[derive(Debug, Serialize, Deserialize, Clone, sqlx::Type, PartialEq)]
+#[derive(Debug, Serialize, Deserialize, Clone, sqlx::Type, PartialEq, ToSchema)]
 #[sqlx(type_name = "varchar", rename_all = "lowercase")]
 pub enum InvoiceStatus {
     #[serde(rename = "draft")]
@@ -46,7 +47,20 @@ pub enum InvoiceStatus {
     Void,
 }
 
-#[derive(Debug, Serialize, Deserialize, FromRow, Clone)]
+impl InvoiceStatus {
+    pub fn to_string(&self) -> String {
+        match self {
+            InvoiceStatus::Draft => "draft".to_string(),
+            InvoiceStatus::Sent => "sent".to_string(),
+            InvoiceStatus::Paid => "paid".to_string(),
+            InvoiceStatus::Partial => "partial".to_string(),
+            InvoiceStatus::Overdue => "overdue".to_string(),
+            InvoiceStatus::Void => "void".to_string(),
+        }
+    }
+}
+
+#[derive(Debug, Serialize, Deserialize, FromRow, Clone, ToSchema)]
 pub struct InvoiceLineItem {
     pub id: Uuid,
     pub invoice_id: Uuid,
@@ -63,7 +77,7 @@ pub struct InvoiceLineItem {
     pub updated_at: DateTime<Utc>,
 }
 
-#[derive(Debug, Serialize, Deserialize, Validate)]
+#[derive(Debug, Serialize, Deserialize, Validate, ToSchema)]
 pub struct CreateInvoiceRequest {
     #[validate(length(min = 1))]
     pub invoice_number: String,
@@ -80,7 +94,7 @@ pub struct CreateInvoiceRequest {
     pub line_items: Vec<CreateInvoiceLineItemRequest>,
 }
 
-#[derive(Debug, Serialize, Deserialize, Clone)]
+#[derive(Debug, Serialize, Deserialize, Clone, ToSchema)]
 pub struct CreateInvoiceLineItemRequest {
     pub line_number: i32,
     pub item_description: String,
@@ -91,7 +105,7 @@ pub struct CreateInvoiceLineItemRequest {
     pub revenue_account_id: Uuid,
 }
 
-#[derive(Debug, Serialize)]
+#[derive(Debug, Serialize, Deserialize, ToSchema)]
 pub struct InvoiceWithLineItems {
     #[serde(flatten)]
     pub invoice: Invoice,

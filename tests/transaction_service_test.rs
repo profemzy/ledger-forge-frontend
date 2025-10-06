@@ -79,8 +79,12 @@ async fn test_create_transaction_unbalanced() {
     let pool = setup_test_db().await;
     cleanup_test_db(&pool).await;
 
-    let cash_account = create_test_account(&pool, "1000", "Cash", AccountType::Asset).await;
-    let revenue_account = create_test_account(&pool, "4000", "Sales Revenue", AccountType::Revenue).await;
+    // Setup cache
+    let cache = setup_test_cache_fallback().await;
+    clear_test_cache(&cache).await;
+
+    let cash_account = create_test_account(&pool, &cache, "1000", "Cash", AccountType::Asset).await;
+    let revenue_account = create_test_account(&pool, &cache, "4000", "Sales Revenue", AccountType::Revenue).await;
 
     let service = TransactionService::new();
     let req = CreateTransactionRequest {
@@ -118,7 +122,11 @@ async fn test_create_transaction_both_debit_and_credit() {
     let pool = setup_test_db().await;
     cleanup_test_db(&pool).await;
 
-    let cash_account = create_test_account(&pool, "1000", "Cash", AccountType::Asset).await;
+    // Setup cache
+    let cache = setup_test_cache_fallback().await;
+    clear_test_cache(&cache).await;
+
+    let cash_account = create_test_account(&pool, &cache, "1000", "Cash", AccountType::Asset).await;
 
     let service = TransactionService::new();
     let req = CreateTransactionRequest {
@@ -188,8 +196,12 @@ async fn test_get_transaction_by_id() {
     let pool = setup_test_db().await;
     cleanup_test_db(&pool).await;
 
-    let cash_account = create_test_account(&pool, "1000", "Cash", AccountType::Asset).await;
-    let revenue_account = create_test_account(&pool, "4000", "Sales", AccountType::Revenue).await;
+    // Setup cache
+    let cache = setup_test_cache_fallback().await;
+    clear_test_cache(&cache).await;
+
+    let cash_account = create_test_account(&pool, &cache, "1000", "Cash", AccountType::Asset).await;
+    let revenue_account = create_test_account(&pool, &cache, "4000", "Sales", AccountType::Revenue).await;
 
     let service = TransactionService::new();
     let create_req = CreateTransactionRequest {
@@ -250,8 +262,12 @@ async fn test_list_transactions() {
     let pool = setup_test_db().await;
     cleanup_test_db(&pool).await;
 
-    let cash_account = create_test_account(&pool, "1000", "Cash", AccountType::Asset).await;
-    let revenue_account = create_test_account(&pool, "4000", "Sales", AccountType::Revenue).await;
+    // Setup cache
+    let cache = setup_test_cache_fallback().await;
+    clear_test_cache(&cache).await;
+
+    let cash_account = create_test_account(&pool, &cache, "1000", "Cash", AccountType::Asset).await;
+    let revenue_account = create_test_account(&pool, &cache, "4000", "Sales", AccountType::Revenue).await;
 
     let service = TransactionService::new();
 
@@ -297,8 +313,12 @@ async fn test_list_transactions_with_status_filter() {
     let pool = setup_test_db().await;
     cleanup_test_db(&pool).await;
 
-    let cash_account = create_test_account(&pool, "1000", "Cash", AccountType::Asset).await;
-    let revenue_account = create_test_account(&pool, "4000", "Sales", AccountType::Revenue).await;
+    // Setup cache
+    let cache = setup_test_cache_fallback().await;
+    clear_test_cache(&cache).await;
+
+    let cash_account = create_test_account(&pool, &cache, "1000", "Cash", AccountType::Asset).await;
+    let revenue_account = create_test_account(&pool, &cache, "4000", "Sales", AccountType::Revenue).await;
 
     let service = TransactionService::new();
 
@@ -343,8 +363,12 @@ async fn test_update_transaction_status_draft_to_posted() {
     let pool = setup_test_db().await;
     cleanup_test_db(&pool).await;
 
-    let cash_account = create_test_account(&pool, "1000", "Cash", AccountType::Asset).await;
-    let revenue_account = create_test_account(&pool, "4000", "Sales", AccountType::Revenue).await;
+    // Setup cache
+    let cache = setup_test_cache_fallback().await;
+    clear_test_cache(&cache).await;
+
+    let cash_account = create_test_account(&pool, &cache, "1000", "Cash", AccountType::Asset).await;
+    let revenue_account = create_test_account(&pool, &cache, "4000", "Sales", AccountType::Revenue).await;
 
     let service = TransactionService::new();
     let req = CreateTransactionRequest {
@@ -389,8 +413,12 @@ async fn test_update_transaction_status_posted_to_void() {
     let pool = setup_test_db().await;
     cleanup_test_db(&pool).await;
 
-    let cash_account = create_test_account(&pool, "1000", "Cash", AccountType::Asset).await;
-    let revenue_account = create_test_account(&pool, "4000", "Sales", AccountType::Revenue).await;
+    // Setup cache
+    let cache = setup_test_cache_fallback().await;
+    clear_test_cache(&cache).await;
+
+    let cash_account = create_test_account(&pool, &cache, "1000", "Cash", AccountType::Asset).await;
+    let revenue_account = create_test_account(&pool, &cache, "4000", "Sales", AccountType::Revenue).await;
 
     let service = TransactionService::new();
     let req = CreateTransactionRequest {
@@ -437,8 +465,12 @@ async fn test_update_transaction_status_invalid_transition() {
     let pool = setup_test_db().await;
     cleanup_test_db(&pool).await;
 
-    let cash_account = create_test_account(&pool, "1000", "Cash", AccountType::Asset).await;
-    let revenue_account = create_test_account(&pool, "4000", "Sales", AccountType::Revenue).await;
+    // Setup cache
+    let cache = setup_test_cache_fallback().await;
+    clear_test_cache(&cache).await;
+
+    let cash_account = create_test_account(&pool, &cache, "1000", "Cash", AccountType::Asset).await;
+    let revenue_account = create_test_account(&pool, &cache, "4000", "Sales", AccountType::Revenue).await;
 
     let service = TransactionService::new();
     let req = CreateTransactionRequest {
@@ -482,8 +514,12 @@ async fn test_delete_transaction_draft() {
     let pool = setup_test_db().await;
     cleanup_test_db(&pool).await;
 
-    let cash_account = create_test_account(&pool, "1000", "Cash", AccountType::Asset).await;
-    let revenue_account = create_test_account(&pool, "4000", "Sales", AccountType::Revenue).await;
+    // Setup cache
+    let cache = setup_test_cache_fallback().await;
+    clear_test_cache(&cache).await;
+
+    let cash_account = create_test_account(&pool, &cache, "1000", "Cash", AccountType::Asset).await;
+    let revenue_account = create_test_account(&pool, &cache, "4000", "Sales", AccountType::Revenue).await;
 
     let service = TransactionService::new();
     let req = CreateTransactionRequest {
@@ -528,8 +564,12 @@ async fn test_delete_transaction_posted_fails() {
     let pool = setup_test_db().await;
     cleanup_test_db(&pool).await;
 
-    let cash_account = create_test_account(&pool, "1000", "Cash", AccountType::Asset).await;
-    let revenue_account = create_test_account(&pool, "4000", "Sales", AccountType::Revenue).await;
+    // Setup cache
+    let cache = setup_test_cache_fallback().await;
+    clear_test_cache(&cache).await;
+
+    let cash_account = create_test_account(&pool, &cache, "1000", "Cash", AccountType::Asset).await;
+    let revenue_account = create_test_account(&pool, &cache, "4000", "Sales", AccountType::Revenue).await;
 
     let service = TransactionService::new();
     let req = CreateTransactionRequest {
@@ -573,8 +613,12 @@ async fn test_get_account_balance() {
     let pool = setup_test_db().await;
     cleanup_test_db(&pool).await;
 
-    let cash_account = create_test_account(&pool, "1000", "Cash", AccountType::Asset).await;
-    let revenue_account = create_test_account(&pool, "4000", "Sales", AccountType::Revenue).await;
+    // Setup cache
+    let cache = setup_test_cache_fallback().await;
+    clear_test_cache(&cache).await;
+
+    let cash_account = create_test_account(&pool, &cache, "1000", "Cash", AccountType::Asset).await;
+    let revenue_account = create_test_account(&pool, &cache, "4000", "Sales", AccountType::Revenue).await;
 
     let service = TransactionService::new();
 
@@ -624,8 +668,12 @@ async fn test_get_account_balance_draft_not_included() {
     let pool = setup_test_db().await;
     cleanup_test_db(&pool).await;
 
-    let cash_account = create_test_account(&pool, "1000", "Cash", AccountType::Asset).await;
-    let revenue_account = create_test_account(&pool, "4000", "Sales", AccountType::Revenue).await;
+    // Setup cache
+    let cache = setup_test_cache_fallback().await;
+    clear_test_cache(&cache).await;
+
+    let cash_account = create_test_account(&pool, &cache, "1000", "Cash", AccountType::Asset).await;
+    let revenue_account = create_test_account(&pool, &cache, "4000", "Sales", AccountType::Revenue).await;
 
     let service = TransactionService::new();
 
