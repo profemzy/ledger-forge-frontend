@@ -13,7 +13,7 @@ use tower_http::cors::{Any, CorsLayer};
 use tracing_subscriber::{layer::SubscriberExt, util::SubscriberInitExt};
 
 use crate::routes::create_routes;
-use crate::services::{AuthService, AccountService, TransactionService, ContactService, InvoiceService, PaymentService, BillService, ReportingService, CacheService};
+use crate::services::{AuthService, AccountService, TransactionService, ContactService, InvoiceService, PaymentService, BillService, ImportService, ReportingService, CacheService};
 
 #[tokio::main]
 async fn main() -> anyhow::Result<()> {
@@ -74,6 +74,7 @@ async fn main() -> anyhow::Result<()> {
     let invoice_service = InvoiceService::new_with_cache(cache_service.clone());
     let payment_service = PaymentService::new_with_cache(cache_service.clone());
     let bill_service = BillService::new_with_cache(cache_service.clone());
+    let import_service = ImportService::new(cache_service.clone());
     let reporting_service = ReportingService::new_with_cache(cache_service.clone());
 
     // Configure CORS
@@ -83,7 +84,7 @@ async fn main() -> anyhow::Result<()> {
         .allow_headers(Any);
 
     // Create application routes
-    let app = create_routes(pool, auth_service, account_service, transaction_service, contact_service, invoice_service, payment_service, bill_service, reporting_service, cache_service)
+    let app = create_routes(pool, auth_service, account_service, transaction_service, contact_service, invoice_service, payment_service, bill_service, import_service, reporting_service, cache_service)
         .layer(cors)
         .layer(tower_http::trace::TraceLayer::new_for_http());
 

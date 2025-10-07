@@ -9,7 +9,7 @@ use utoipa_swagger_ui::SwaggerUi;
 
 use crate::{
     handlers,
-    services::{AuthService, AccountService, TransactionService, ContactService, InvoiceService, PaymentService, BillService, CacheService, ReportingService},
+    services::{AuthService, AccountService, TransactionService, ContactService, InvoiceService, PaymentService, BillService, ImportService, CacheService, ReportingService},
     utils::HealthResponse
 };
 
@@ -24,6 +24,7 @@ pub struct AppState {
     pub invoice_service: InvoiceService,
     pub payment_service: PaymentService,
     pub bill_service: BillService,
+    pub import_service: ImportService,
     pub reporting_service: ReportingService,
     pub cache_service: CacheService,
 }
@@ -60,7 +61,7 @@ pub async fn health_check(State(state): State<AppState>) -> Json<HealthResponse>
 }
 
 /// Create all application routes
-pub fn create_routes(pool: PgPool, auth_service: AuthService, account_service: AccountService, transaction_service: TransactionService, contact_service: ContactService, invoice_service: InvoiceService, payment_service: PaymentService, bill_service: BillService, reporting_service: ReportingService, cache_service: CacheService) -> Router {
+pub fn create_routes(pool: PgPool, auth_service: AuthService, account_service: AccountService, transaction_service: TransactionService, contact_service: ContactService, invoice_service: InvoiceService, payment_service: PaymentService, bill_service: BillService, import_service: ImportService, reporting_service: ReportingService, cache_service: CacheService) -> Router {
     let app_state = AppState {
         pool,
         auth_service,
@@ -70,6 +71,7 @@ pub fn create_routes(pool: PgPool, auth_service: AuthService, account_service: A
         invoice_service,
         payment_service,
         bill_service,
+        import_service,
         reporting_service,
         cache_service,
     };
@@ -128,6 +130,9 @@ pub fn create_routes(pool: PgPool, auth_service: AuthService, account_service: A
         .route("/api/v1/bills/{id}", delete(handlers::delete_bill))
         .route("/api/v1/bills/overdue", get(handlers::get_overdue_bills))
         .route("/api/v1/vendors/{id}/bills", get(handlers::get_vendor_bills))
+        // Import routes
+        .route("/api/v1/import/accounts", post(handlers::import_accounts_csv))
+        .route("/api/v1/import/accounts/template", get(handlers::get_accounts_csv_template))
         // Reporting routes
         .route("/api/v1/reports/trial-balance", get(handlers::get_trial_balance))
         .route("/api/v1/reports/profit-loss", get(handlers::get_profit_loss))

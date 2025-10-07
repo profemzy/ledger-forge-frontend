@@ -7,6 +7,7 @@ pub mod payment;
 pub mod cache;
 pub mod reporting;
 pub mod bill;
+pub mod import;
 
 pub use auth::AuthService;
 pub use account::AccountService;
@@ -15,5 +16,6 @@ pub use contact::ContactService;
 pub use invoice::InvoiceService;
 pub use payment::PaymentService;
 pub use bill::BillService;
+pub use import::ImportService;
 pub use cache::CacheService;
 pub use reporting::ReportingService;

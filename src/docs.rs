@@ -83,6 +83,9 @@ use crate::utils::{ApiResponse, HealthResponse};
         crate::handlers::bill::delete_bill,
         crate::handlers::bill::get_vendor_bills,
         crate::handlers::bill::get_overdue_bills,
+        // Import
+        crate::handlers::import::import_accounts_csv,
+        crate::handlers::import::get_accounts_csv_template,
         // Reporting
         crate::handlers::reporting::get_trial_balance,
         crate::handlers::reporting::get_profit_loss,
@@ -179,6 +182,8 @@ use crate::utils::{ApiResponse, HealthResponse};
             crate::handlers::invoice::UpdateInvoiceStatusRequest,
             crate::handlers::payment::ApplyPaymentRequest,
             crate::handlers::bill::UpdateBillStatusRequest,
+            crate::handlers::import::ImportResultResponse,
+            crate::handlers::import::ImportErrorResponse,
         )
     ),
     modifiers(&SecurityAddon),
@@ -191,6 +196,7 @@ use crate::utils::{ApiResponse, HealthResponse};
         (name = "invoices", description = "Invoice management with line items and status tracking"),
         (name = "payments", description = "Payment processing and application to invoices"),
         (name = "bills", description = "Bill management (Accounts Payable)"),
+        (name = "import", description = "Data import from CSV files"),
         (name = "reporting", description = "Financial reporting and analysis"),
     ),
     info(

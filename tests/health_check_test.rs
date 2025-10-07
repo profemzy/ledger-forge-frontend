@@ -4,7 +4,7 @@ use serde_json::Value;
 mod common;
 use common::{setup_test_db, cleanup_test_db, TEST_JWT_SECRET};
 
-use ledger_forge::services::{AuthService, AccountService, TransactionService, ContactService, InvoiceService, PaymentService, BillService, ReportingService, CacheService};
+use ledger_forge::services::{AuthService, AccountService, TransactionService, ContactService, InvoiceService, PaymentService, BillService, ImportService, ReportingService, CacheService};
 use ledger_forge::routes::create_routes;
 
 #[tokio::test]
@@ -18,8 +18,9 @@ async fn test_health_endpoint_returns_200() {
     let invoice_service = InvoiceService::new_with_cache(cache_service.clone());
     let payment_service = PaymentService::new_with_cache(cache_service.clone());
     let bill_service = BillService::new_with_cache(cache_service.clone());
+    let import_service = ImportService::new(cache_service.clone());
     let reporting_service = ReportingService::new_with_cache(cache_service.clone());
-    let app = create_routes(pool, auth_service, account_service, transaction_service, contact_service, invoice_service, payment_service, bill_service, reporting_service, cache_service);
+    let app = create_routes(pool, auth_service, account_service, transaction_service, contact_service, invoice_service, payment_service, bill_service, import_service, reporting_service, cache_service);
     let server = TestServer::new(app).unwrap();
 
     let response = server.get("/api/v1/health").await;
@@ -41,8 +42,9 @@ async fn test_health_endpoint_checks_database() {
     let invoice_service = InvoiceService::new_with_cache(cache_service.clone());
     let payment_service = PaymentService::new_with_cache(cache_service.clone());
     let bill_service = BillService::new_with_cache(cache_service.clone());
+    let import_service = ImportService::new(cache_service.clone());
     let reporting_service = ReportingService::new_with_cache(cache_service.clone());
-    let app = create_routes(pool, auth_service, account_service, transaction_service, contact_service, invoice_service, payment_service, bill_service, reporting_service, cache_service);
+    let app = create_routes(pool, auth_service, account_service, transaction_service, contact_service, invoice_service, payment_service, bill_service, import_service, reporting_service, cache_service);
     let server = TestServer::new(app).unwrap();
 
     let response = server.get("/api/v1/health").await;

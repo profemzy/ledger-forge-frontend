@@ -7,7 +7,7 @@ mod common;
 use common::{setup_test_db, cleanup_test_db, TestUser, TEST_JWT_SECRET};
 use common::{assert_success_response, assert_error_response, assert_valid_uuid, assert_valid_jwt};
 
-use ledger_forge::services::{AuthService, AccountService, TransactionService, ContactService, InvoiceService, PaymentService, BillService, ReportingService, CacheService};
+use ledger_forge::services::{AuthService, AccountService, TransactionService, ContactService, InvoiceService, PaymentService, BillService, ImportService, ReportingService, CacheService};
 use ledger_forge::routes::create_routes;
 
 async fn create_test_server() -> TestServer {
@@ -22,8 +22,9 @@ async fn create_test_server() -> TestServer {
     let invoice_service = InvoiceService::new_with_cache(cache_service.clone());
     let payment_service = PaymentService::new_with_cache(cache_service.clone());
     let bill_service = BillService::new_with_cache(cache_service.clone());
+    let import_service = ImportService::new(cache_service.clone());
     let reporting_service = ReportingService::new_with_cache(cache_service.clone());
-    let app = create_routes(pool, auth_service, account_service, transaction_service, contact_service, invoice_service, payment_service, bill_service, reporting_service, cache_service);
+    let app = create_routes(pool, auth_service, account_service, transaction_service, contact_service, invoice_service, payment_service, bill_service, import_service, reporting_service, cache_service);
 
     TestServer::new(app).unwrap()
 }
