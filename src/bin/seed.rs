@@ -14,8 +14,20 @@ async fn main() -> Result<()> {
         .with_env_filter(tracing_subscriber::EnvFilter::from_default_env())
         .init();
 
-    println!("🚀 Akowe Database Seeder");
-    println!("========================\n");
+    println!("🚀 LedgerForge Database Seeder");
+    println!("==============================\n");
+
+    // Safety check: Only allow seeding in development environment
+    let environment = env::var("ENVIRONMENT").unwrap_or_else(|_| "production".to_string());
+    
+    if environment.to_lowercase() != "development" {
+        eprintln!("❌ ERROR: Database seeding is only allowed in development environment!");
+        eprintln!("   Current environment: {}", environment);
+        eprintln!("   Set ENVIRONMENT=development in your .env file to enable seeding.");
+        std::process::exit(1);
+    }
+
+    println!("✅ Environment check passed: {}", environment);
 
     // Get database URL from environment
     let database_url = env::var("DATABASE_URL")

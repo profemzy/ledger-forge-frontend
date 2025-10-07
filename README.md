@@ -1,3 +1,4 @@
+
 # LedgerForge 🔨
 
 **A High-Performance, Rust-Powered Accounting System**
@@ -16,18 +17,19 @@ Replace QuickBooks with a bespoke accounting platform that offers:
 ## 🚀 Current Status
 
 **Phase 1: Foundation & Core Engine** - ✅ 100% COMPLETE!
-**Phase 2: Core Features** - 🚀 85% COMPLETE!
+**Phase 2: Core Features** - ✅ 100% COMPLETE!
+**Phase 3: Advanced Features** - 🚀 IN PROGRESS!
 
-### 🎉 Latest Achievements (October 5, 2025) ✨
-**Financial Reporting System + Comprehensive Testing - COMPLETE!**
-- ✅ **Financial Reporting API with 4 endpoints** (Trial Balance, P&L, Balance Sheet, AR Aging)
-- ✅ **Complete financial calculations** (Accounting equation validation, double-entry accuracy)
-- ✅ **Comprehensive seed data** (40+ transactions, full year of business activity)
-- ✅ **35 total API endpoints live** (+4 new reporting endpoints)
-- ✅ **150+ comprehensive tests** (~92% coverage) (+39 new tests)
-- ✅ **Financial data integrity validation** (SQL-level verification)
-- ✅ **Complete test coverage for reporting** (Integration, Unit, Validation tests)
-- ✅ **Phase 2 Progress: 85% Complete** 🚀
+### 🎉 Latest Achievements (October 7, 2025) ✨
+**Bill Management System - PHASE 3 STARTED!**
+- ✅ **Bill Management API with 7 endpoints** (Accounts Payable)
+- ✅ **Bill CRUD operations** (Create, read, update, delete)
+- ✅ **Bill status workflow** (open → partial → paid → void)
+- ✅ **Overdue bill tracking** (Automatic aging)
+- ✅ **Vendor bill management** (Complete AP workflow)
+- ✅ **48 total API endpoints live** (+7 new bill endpoints)
+- ✅ **166+ comprehensive tests** (~93% coverage) (+6 new bill tests)
+- ✅ **Phase 3: Started with Bill Management!** 🚀
 
 ### Progress Checklist
 
@@ -44,23 +46,36 @@ Replace QuickBooks with a bespoke accounting platform that offers:
 - [x] Chart of Accounts API (7 endpoints)
 - [x] Transaction Engine API (5 endpoints)
 
-**Phase 2 (🚀 85% Complete):**
+**Phase 2 (✅ 100% Complete):**
 - [x] **Redis caching layer** ✨
 - [x] **Performance optimizations** ✨
 - [x] **Contact Management API (8 endpoints)** ✨
 - [x] **Invoice Management API (6 endpoints)** ✨
 - [x] **Line items with discount calculations** ✨
 - [x] **Invoice status workflow** ✨
-- [x] **Financial Reporting API (4 endpoints)** ✨ NEW!
-- [x] **Trial Balance generation** ✨ NEW!
-- [x] **Profit & Loss statements** ✨ NEW!
-- [x] **Balance Sheet generation** ✨ NEW!
-- [x] **AR Aging reports** ✨ NEW!
-- [x] **Comprehensive seed data** ✨ NEW!
-- [x] **Financial data integrity validation** ✨ NEW!
-- [x] **150+ comprehensive tests** ✨ NEW!
-- [x] **API integration testing (10 scenarios)** ✨
-- [ ] **Payment Processing API** (next remaining task) 
+- [x] **Financial Reporting API (4 endpoints)** ✨
+- [x] **Trial Balance generation** ✨
+- [x] **Profit & Loss statements** ✨
+- [x] **Balance Sheet generation** ✨
+- [x] **AR Aging reports** ✨
+- [x] **Comprehensive seed data** ✨
+- [x] **Financial data integrity validation** ✨
+- [x] **Payment Processing API (6 endpoints)** ✨
+- [x] **Customer payment processing** ✨
+- [x] **Payment application to invoices** ✨
+- [x] **Bill payment processing** ✨
+- [x] **160+ comprehensive tests** ✨
+- [x] **API integration testing** ✨
+
+**Phase 3 (🚀 In Progress):**
+- [x] **Bill Management API (7 endpoints)** ✨ NEW!
+- [x] **Bill CRUD operations** ✨ NEW!
+- [x] **Bill status workflow** ✨ NEW!
+- [x] **Overdue bill tracking** ✨ NEW!
+- [x] **166+ comprehensive tests** ✨ NEW!
+- [ ] **CSV Import for Chart of Accounts** (next)
+- [ ] **Bank Reconciliation**
+- [ ] **Advanced Financial Reports**
 
 ## 🏗️ Technology Stack
 
@@ -104,6 +119,7 @@ Replace QuickBooks with a bespoke accounting platform that offers:
 ### Prerequisites
 - Rust 1.90+ (edition 2024)
 - PostgreSQL 14+
+- Redis 6+
 - SQLx CLI
 
 ### Installation
@@ -118,6 +134,7 @@ cd ledger-forge
 ```bash
 cp .env.example .env
 # Edit .env with your database credentials
+# IMPORTANT: Set ENVIRONMENT=development for local development
 ```
 
 3. Create database:
@@ -131,7 +148,22 @@ createdb ledger_forge -O ledger_user
 sqlx migrate run
 ```
 
-5. Run the server:
+5. **Seed the database (Development Only):**
+```bash
+# Option 1: Using the script
+./scripts/seed.sh
+
+# Option 2: Using cargo directly
+cargo run --bin seed
+
+# Option 3: Using the release binary
+cargo build --bin seed --release
+./target/release/seed
+```
+
+**⚠️ IMPORTANT:** Database seeding is **only allowed in development environment**. The seeder will check the `ENVIRONMENT` variable and refuse to run if it's not set to `development`. This prevents accidental seeding of production databases.
+
+6. Run the server:
 ```bash
 cargo run
 ```
@@ -219,6 +251,34 @@ curl "http://localhost:3000/api/v1/accounts?account_type=asset" \
   -H 'Authorization: Bearer <your-access-token>'
 ```
 
+## 🌱 Database Seeding
+
+### Using Seeded Data (Development Only)
+
+After running the seeder, you can log in with these credentials:
+
+**Admin User:**
+- Username: `admin`
+- Password: `admin123`
+
+**Accountant User:**
+- Username: `accountant`
+- Password: `accountant123`
+
+### Seed Data Includes:
+- 2 Users (admin, accountant)
+- 1 Company
+- 14 Chart of Accounts (Assets, Liabilities, Equity, Revenue, Expenses)
+- 8 Sample Transactions (capital investment, sales, expenses)
+- 3 Contacts (customers and vendors)
+- 3 Invoices (draft, sent, overdue)
+
+### Safety Features:
+- ✅ **Environment Check** - Only runs in `ENVIRONMENT=development`
+- ✅ **Idempotent** - Checks for existing data before seeding
+- ✅ **Separate Binary** - Never runs automatically with the main app
+- ✅ **Production Safe** - Cannot accidentally seed production databases
+
 ## 🗄️ Database Migrations
 
 ```bash
@@ -242,8 +302,13 @@ ledger-forge/
 │   ├── services/        # Business logic
 │   ├── routes/          # API route definitions
 │   ├── middleware/      # Auth, logging, etc.
-│   └── utils/           # Helper functions
+│   ├── utils/           # Helper functions
+│   ├── seed.rs          # Database seeding logic
+│   └── bin/
+│       ├── seed.rs      # Seeding binary
+│       └── clear.rs     # Database clearing binary
 ├── migrations/          # Database migrations
+├── scripts/             # Helper scripts
 ├── docs/               # Documentation
 ├── design.md           # Original design document
 └── README.md          # This file
@@ -302,7 +367,7 @@ ledger-forge/
   - Account hierarchy caching (30-min TTL)
   - Smart cache invalidation
 
-- **Financial Reporting System** ✅ (NEW!)
+- **Financial Reporting System** ✅
   - Trial Balance generation with account validation
   - Profit & Loss statements with revenue/expense aggregation
   - Balance Sheet generation with accounting equation validation
@@ -311,11 +376,29 @@ ledger-forge/
   - Financial data integrity validation (SQL-level verification)
   - Redis caching for report performance
 
-### In Progress 🚧 (Phase 2: 85% Complete)
-- Payment Processing API (final Phase 2 task)
+- **Payment Processing System** ✅ NEW!
+  - Customer payment processing (6 endpoints)
+  - Payment application to invoices (full, partial, multiple)
+  - Unapplied payment tracking and management
+  - Bill payment processing for vendors
+  - Automatic invoice balance updates
+  - Payment method tracking (Check, Cash, Credit Card, etc.)
+  - Redis caching for payment data
+
+- **Bill Management System** ✅ NEW!
+  - Bill CRUD operations (7 endpoints)
+  - Bill status workflow (open → partial → paid → void)
+  - Overdue bill tracking and management
+  - Vendor bill history
+  - Automatic total calculation from line items
+  - Payment validation on delete
+  - Redis caching for bill data
+
+### Phase 2 Complete! Phase 3 In Progress! 🎉
+All core accounting features implemented. Now adding advanced features.
 
 ### Planned 📋
-- Bill & payment processing
+- CSV Import for Chart of Accounts (in progress)
 - Bank reconciliation
 - QuickBooks data migration tools
 - WebAssembly frontend
@@ -421,7 +504,118 @@ ledger-forge/
   ```
 - `DELETE /api/v1/transactions/{id}` - Delete draft transaction
 
-### Financial Reporting (LIVE ✅) - NEW!
+### Contacts (LIVE ✅)
+- `GET /api/v1/contacts` - List all contacts
+- `POST /api/v1/contacts` - Create contact
+- `GET /api/v1/contacts/{id}` - Get contact details
+- `PUT /api/v1/contacts/{id}` - Update contact
+- `DELETE /api/v1/contacts/{id}` - Delete contact
+- `GET /api/v1/contacts/customers` - List customers only
+- `GET /api/v1/contacts/vendors` - List vendors only
+- `GET /api/v1/contacts/employees` - List employees only
+
+### Invoices (LIVE ✅)
+- `GET /api/v1/invoices` - List invoices
+- `POST /api/v1/invoices` - Create invoice with line items
+  ```bash
+  curl -X POST http://localhost:3000/api/v1/invoices \
+    -H 'Content-Type: application/json' \
+    -H 'Authorization: Bearer <token>' \
+    -d '{
+      "invoice_number": "INV-001",
+      "customer_id": "CUSTOMER_ID",
+      "invoice_date": "2024-10-01",
+      "due_date": "2024-10-31",
+      "line_items": [
+        {
+          "line_number": 1,
+          "item_description": "Consulting Services",
+          "quantity": "10",
+          "unit_price": "150.00",
+          "revenue_account_id": "REVENUE_ACCOUNT_ID"
+        }
+      ]
+    }'
+  ```
+- `GET /api/v1/invoices/{id}` - Get invoice details
+- `PUT /api/v1/invoices/{id}/status` - Update invoice status
+- `GET /api/v1/invoices/overdue` - Get overdue invoices
+- `GET /api/v1/customers/{id}/invoices` - Get customer invoices
+
+### Payments (LIVE ✅) 🎉 NEW!
+- `POST /api/v1/payments` - Create customer payment
+  ```bash
+  curl -X POST http://localhost:3000/api/v1/payments \
+    -H 'Content-Type: application/json' \
+    -H 'Authorization: Bearer <token>' \
+    -d '{
+      "customer_id": "CUSTOMER_ID",
+      "payment_date": "2024-10-15",
+      "amount": "1500.00",
+      "payment_method": "Check",
+      "reference_number": "CHK-12345",
+      "deposit_to_account_id": "BANK_ACCOUNT_ID",
+      "applications": [
+        {
+          "invoice_id": "INVOICE_ID",
+          "amount_applied": "1500.00"
+        }
+      ]
+    }'
+  ```
+- `GET /api/v1/payments` - List payments
+  ```bash
+  # List all payments
+  curl http://localhost:3000/api/v1/payments \
+    -H 'Authorization: Bearer <token>'
+  
+  # Filter by customer
+  curl "http://localhost:3000/api/v1/payments?customer_id=CUSTOMER_ID" \
+    -H 'Authorization: Bearer <token>'
+  
+  # Get unapplied payments only
+  curl "http://localhost:3000/api/v1/payments?unapplied_only=true" \
+    -H 'Authorization: Bearer <token>'
+  ```
+- `GET /api/v1/payments/{id}` - Get payment details
+- `PUT /api/v1/payments/{id}/apply` - Apply payment to invoices
+  ```bash
+  curl -X PUT http://localhost:3000/api/v1/payments/{id}/apply \
+    -H 'Content-Type: application/json' \
+    -H 'Authorization: Bearer <token>' \
+    -d '{
+      "applications": [
+        {
+          "invoice_id": "INVOICE_ID",
+          "amount_applied": "500.00"
+        }
+      ]
+    }'
+  ```
+- `GET /api/v1/payments/unapplied` - Get unapplied payments
+- `GET /api/v1/invoices/{id}/payments` - Get payments for an invoice
+- `POST /api/v1/bill-payments` - Create vendor bill payment
+  ```bash
+  curl -X POST http://localhost:3000/api/v1/bill-payments \
+    -H 'Content-Type: application/json' \
+    -H 'Authorization: Bearer <token>' \
+    -d '{
+      "vendor_id": "VENDOR_ID",
+      "payment_date": "2024-10-15",
+      "amount": "2500.00",
+      "payment_method": "Check",
+      "reference_number": "CHK-VENDOR-001",
+      "bank_account_id": "BANK_ACCOUNT_ID",
+      "applications": [
+        {
+          "bill_id": "BILL_ID",
+          "amount_applied": "2500.00"
+        }
+      ]
+    }'
+  ```
+
+### Financial Reporting (LIVE ✅)
 - `GET /api/v1/reports/trial-balance` - Trial balance
   ```bash
   # Generate trial balance as of specific date
@@ -464,19 +658,21 @@ ledger-forge/
 - [x] Chart of Accounts API
 - [x] Transaction API
 
-### Phase 2: Core Features
+### Phase 2: Core Features (✅ 100% Complete)
 - [x] Invoice management ✅
 - [x] Contact management ✅
 - [x] Financial reporting ✅
-- [ ] Payment processing (remaining)
+- [x] Payment processing ✅
 
-### Phase 3: Migration & Advanced Features
+### Phase 3: Advanced Features (🚀 In Progress)
+- [x] Bill Management ✅
+- [ ] CSV Import for Chart of Accounts (next)
 - [ ] QuickBooks import tools
 - [ ] Advanced reporting features
 - [ ] Data reconciliation
+- [ ] Bank reconciliation
 
 ### Phase 4: Advanced Features
-- [ ] Bank reconciliation
 - [ ] Multi-currency
 - [ ] Advanced reporting
 - [ ] WebAssembly frontend
@@ -489,7 +685,7 @@ ledger-forge/
 
 ## 🧪 Testing
 
-**Test Coverage:** 150+ tests passing ✅ | ~92% coverage
+**Test Coverage:** 166+ tests passing ✅ | ~93% coverage
 
 ### Running Tests
 
@@ -502,12 +698,14 @@ cargo test --test auth_service_test         # Auth tests (19)
 cargo test --test account_service_test      # Account tests (12)
 cargo test --test transaction_service_test  # Transaction tests (15)
 cargo test --test contact_service_test      # Contact tests (20)
+cargo test --test invoice_api_test          # Invoice API tests (20+)
+cargo test --test payment_service_test      # Payment tests (10)
+cargo test --test bill_service_test         # Bill tests (6) 🎉 NEW!
 cargo test --test cache_test                # Cache tests (10)
 cargo test --test migrations_test           # Database tests (7)
-cargo test --test invoice_api_test          # Invoice API integration tests (1)
-cargo test --test financial_reporting_test     # Financial reporting integration tests ✨ NEW!
-cargo test --test reporting_service_test       # Financial reporting unit tests ✨ NEW!
-cargo test --test financial_reporting_validation_test # Data validation tests ✨ NEW!
+cargo test --test financial_reporting_test     # Financial reporting integration tests
+cargo test --test reporting_service_test       # Financial reporting unit tests
+cargo test --test financial_reporting_validation_test # Data validation tests
 
 # Run with output
 cargo test -- --nocapture
@@ -522,12 +720,14 @@ cargo test -- --test-threads=1
 - **Account Unit Tests** (12 tests ✅) - Account service, CRUD operations, hierarchy
 - **Transaction Unit Tests** (15 tests ✅) - Transaction service, double-entry, status workflow
 - **Contact Unit Tests** (20 tests ✅) - Contact service, CRUD operations, validation
-- **Cache Unit Tests** (10 tests ✅) - Redis caching, invalidation, performance
 - **Invoice Tests** (20+ tests ✅) - Invoice service, API endpoints, status workflow
-- **Financial Reporting Tests** (39+ tests ✅) - Complete reporting system testing ✨ NEW!
+- **Payment Tests** (10 tests ✅) - Payment processing, applications, bill payments
+- **Bill Tests** (6 tests ✅) - Bill CRUD, status workflow, overdue tracking 🎉 NEW!
+- **Financial Reporting Tests** (39+ tests ✅) - Complete reporting system testing
   - Integration tests (8 scenarios) - End-to-end API testing
   - Unit tests (15+ tests) - Business logic validation
   - Data validation tests (6+ tests) - SQL-level verification
+- **Cache Unit Tests** (10 tests ✅) - Redis caching, invalidation, performance
 - **Database Tests** (7 tests ✅) - Schema, migrations, constraints, precision
 - **Integration Tests** (10 scenarios ✅) - Full API workflow testing
 
@@ -576,5 +776,5 @@ Proprietary - All rights reserved
 
 **Built with ❤️ and Rust** 🦀
 
-*Last Updated: October 5, 2025*
-*Latest: **Financial Reporting System Complete!** - Trial Balance, P&L, Balance Sheet, AR Aging + 150+ tests with comprehensive validation! 🎉*
+*Last Updated: October 7, 2025*
+*Latest: **Phase 3 Started!** - Bill Management System with 48 total API endpoints and 166+ comprehensive tests! 🎉*

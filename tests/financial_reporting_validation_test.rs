@@ -16,9 +16,9 @@ async fn test_database_seeding_validation() -> sqlx::Result<()> {
         .execute(&pool)
         .await?;
 
-    // Run the seed data migration
-    let seed_sql = include_str!("../migrations/20241220000000_financial_reporting_seed_data.sql");
-    sqlx::query(seed_sql).execute(&pool).await?;
+    // Use Rust seeding system instead of SQL migration
+    ledger_forge::seed::seed_database(&pool).await
+        .map_err(|e| sqlx::Error::Io(std::io::Error::new(std::io::ErrorKind::Other, e.to_string())))?;
 
     // Basic connectivity test
     let account_count: i64 = sqlx::query_scalar("SELECT COUNT(*) FROM chart_of_accounts")
@@ -65,9 +65,9 @@ async fn test_trial_balance_data_validation() -> sqlx::Result<()> {
 
     let pool = sqlx::PgPool::connect(&database_url).await?;
 
-    // Ensure database is seeded
-    let seed_sql = include_str!("../migrations/20241220000000_financial_reporting_seed_data.sql");
-    sqlx::query(seed_sql).execute(&pool).await?;
+    // Use Rust seeding system
+    ledger_forge::seed::seed_database(&pool).await
+        .map_err(|e| sqlx::Error::Io(std::io::Error::new(std::io::ErrorKind::Other, e.to_string())))?;
 
     // Test trial balance logic directly in SQL
     let result = sqlx::query!(
@@ -146,9 +146,9 @@ async fn test_profit_loss_data_validation() -> sqlx::Result<()> {
 
     let pool = sqlx::PgPool::connect(&database_url).await?;
 
-    // Ensure database is seeded
-    let seed_sql = include_str!("../migrations/20241220000000_financial_reporting_seed_data.sql");
-    sqlx::query(seed_sql).execute(&pool).await?;
+    // Use Rust seeding system
+    ledger_forge::seed::seed_database(&pool).await
+        .map_err(|e| sqlx::Error::Io(std::io::Error::new(std::io::ErrorKind::Other, e.to_string())))?;
 
     // Test P&L logic directly in SQL
     let result = sqlx::query!(
@@ -214,9 +214,9 @@ async fn test_balance_sheet_data_validation() -> sqlx::Result<()> {
 
     let pool = sqlx::PgPool::connect(&database_url).await?;
 
-    // Ensure database is seeded
-    let seed_sql = include_str!("../migrations/20241220000000_financial_reporting_seed_data.sql");
-    sqlx::query(seed_sql).execute(&pool).await?;
+    // Use Rust seeding system
+    ledger_forge::seed::seed_database(&pool).await
+        .map_err(|e| sqlx::Error::Io(std::io::Error::new(std::io::ErrorKind::Other, e.to_string())))?;
 
     // Test balance sheet logic directly in SQL
     let result = sqlx::query!(
@@ -278,9 +278,9 @@ async fn test_transaction_double_entry_validation() -> sqlx::Result<()> {
 
     let pool = sqlx::PgPool::connect(&database_url).await?;
 
-    // Ensure database is seeded
-    let seed_sql = include_str!("../migrations/20241220000000_financial_reporting_seed_data.sql");
-    sqlx::query(seed_sql).execute(&pool).await?;
+    // Use Rust seeding system
+    ledger_forge::seed::seed_database(&pool).await
+        .map_err(|e| sqlx::Error::Io(std::io::Error::new(std::io::ErrorKind::Other, e.to_string())))?;
 
     // Verify that all transactions follow double-entry rules
     let result = sqlx::query!(
@@ -350,9 +350,9 @@ async fn test_account_types_validation() -> sqlx::Result<()> {
 
     let pool = sqlx::PgPool::connect(&database_url).await?;
 
-    // Ensure database is seeded
-    let seed_sql = include_str!("../migrations/20241220000000_financial_reporting_seed_data.sql");
-    sqlx::query(seed_sql).execute(&pool).await?;
+    // Use Rust seeding system
+    ledger_forge::seed::seed_database(&pool).await
+        .map_err(|e| sqlx::Error::Io(std::io::Error::new(std::io::ErrorKind::Other, e.to_string())))?;
 
     // Verify we have all required account types
     let result = sqlx::query!(

@@ -17,6 +17,9 @@ use crate::models::{
     // Payment models
     Payment, PaymentApplication, CreatePaymentRequest, PaymentApplicationRequest,
     BillPayment, CreateBillPaymentRequest, BillPaymentApplicationRequest,
+    // Bill models
+    Bill, BillLineItem, BillStatus, CreateBillRequest, CreateBillLineItemRequest,
+    BillWithLineItems,
     // Reporting models
     TrialBalance, TrialBalanceEntry, ProfitLossStatement, ProfitLossEntry,
     BalanceSheet, BalanceSheetEntry, AccountsReceivableAging, AgingBucket,
@@ -72,6 +75,14 @@ use crate::utils::{ApiResponse, HealthResponse};
         crate::handlers::payment::apply_payment,
         crate::handlers::payment::get_unapplied_payments,
         crate::handlers::payment::create_bill_payment,
+        // Bills
+        crate::handlers::bill::create_bill,
+        crate::handlers::bill::list_bills,
+        crate::handlers::bill::get_bill,
+        crate::handlers::bill::update_bill_status,
+        crate::handlers::bill::delete_bill,
+        crate::handlers::bill::get_vendor_bills,
+        crate::handlers::bill::get_overdue_bills,
         // Reporting
         crate::handlers::reporting::get_trial_balance,
         crate::handlers::reporting::get_profit_loss,
@@ -143,6 +154,13 @@ use crate::utils::{ApiResponse, HealthResponse};
             BillPayment,
             CreateBillPaymentRequest,
             BillPaymentApplicationRequest,
+            // Bill types
+            Bill,
+            BillLineItem,
+            BillStatus,
+            CreateBillRequest,
+            CreateBillLineItemRequest,
+            BillWithLineItems,
             // Reporting types
             TrialBalance,
             TrialBalanceEntry,
@@ -160,6 +178,7 @@ use crate::utils::{ApiResponse, HealthResponse};
             crate::handlers::transaction::UpdateStatusRequest,
             crate::handlers::invoice::UpdateInvoiceStatusRequest,
             crate::handlers::payment::ApplyPaymentRequest,
+            crate::handlers::bill::UpdateBillStatusRequest,
         )
     ),
     modifiers(&SecurityAddon),
@@ -171,6 +190,7 @@ use crate::utils::{ApiResponse, HealthResponse};
         (name = "contacts", description = "Contact management (Customers, Vendors, Employees)"),
         (name = "invoices", description = "Invoice management with line items and status tracking"),
         (name = "payments", description = "Payment processing and application to invoices"),
+        (name = "bills", description = "Bill management (Accounts Payable)"),
         (name = "reporting", description = "Financial reporting and analysis"),
     ),
     info(

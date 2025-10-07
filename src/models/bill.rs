@@ -5,8 +5,9 @@ use serde::{Deserialize, Serialize};
 use sqlx::FromRow;
 use uuid::Uuid;
 use validator::Validate;
+use utoipa::ToSchema;
 
-#[derive(Debug, Serialize, Deserialize, FromRow, Clone)]
+#[derive(Debug, Serialize, Deserialize, FromRow, Clone, ToSchema)]
 pub struct Bill {
     pub id: Uuid,
     pub quickbooks_id: Option<String>,
@@ -25,7 +26,7 @@ pub struct Bill {
     pub updated_at: DateTime<Utc>,
 }
 
-#[derive(Debug, Serialize, Deserialize, Clone, sqlx::Type, PartialEq)]
+#[derive(Debug, Serialize, Deserialize, Clone, sqlx::Type, PartialEq, ToSchema)]
 #[sqlx(type_name = "varchar", rename_all = "lowercase")]
 pub enum BillStatus {
     #[serde(rename = "open")]
@@ -38,7 +39,7 @@ pub enum BillStatus {
     Void,
 }
 
-#[derive(Debug, Serialize, Deserialize, FromRow, Clone)]
+#[derive(Debug, Serialize, Deserialize, FromRow, Clone, ToSchema)]
 pub struct BillLineItem {
     pub id: Uuid,
     pub bill_id: Uuid,
@@ -52,7 +53,7 @@ pub struct BillLineItem {
     pub updated_at: DateTime<Utc>,
 }
 
-#[derive(Debug, Serialize, Deserialize, Validate)]
+#[derive(Debug, Serialize, Deserialize, Validate, ToSchema)]
 pub struct CreateBillRequest {
     pub bill_number: Option<String>,
     pub vendor_id: Uuid,
@@ -65,7 +66,7 @@ pub struct CreateBillRequest {
     pub line_items: Vec<CreateBillLineItemRequest>,
 }
 
-#[derive(Debug, Serialize, Deserialize, Clone)]
+#[derive(Debug, Serialize, Deserialize, Clone, ToSchema)]
 pub struct CreateBillLineItemRequest {
     pub line_number: i32,
     pub description: Option<String>,
@@ -75,7 +76,7 @@ pub struct CreateBillLineItemRequest {
     pub customer_id: Option<Uuid>,
 }
 
-#[derive(Debug, Serialize)]
+#[derive(Debug, Serialize, Deserialize, ToSchema)]
 pub struct BillWithLineItems {
     #[serde(flatten)]
     pub bill: Bill,

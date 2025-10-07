@@ -1,8 +1,8 @@
 # LedgerForge Development Guide
 
-**Last Updated:** October 5, 2025
-**Current Phase:** Phase 2 - Core Features (🚀 85% Complete)
-**Status:** Production-ready with Financial Reporting System and comprehensive testing
+**Last Updated:** October 7, 2025
+**Current Phase:** Phase 2 - Core Features (✅ 100% COMPLETE!)
+**Status:** Production-ready with complete accounting system and comprehensive testing
 
 ---
 
@@ -37,32 +37,42 @@ open http://localhost:3000/swagger-ui/
 - Transaction Engine API (5 endpoints)
 - Double-entry accounting validation
 
-### 🚀 **Phase 2: Core Features (85% Complete)**
+### ✅ **Phase 2: Core Features (100% COMPLETE!)**
 - ✅ Contact Management API (8 endpoints) - Customers, Vendors, Employees
 - ✅ Invoice Management API (6 endpoints) - Complete CRUD with line items
 - ✅ Financial Reporting API (4 endpoints) - Trial Balance, P&L, Balance Sheet, AR Aging
+- ✅ Payment Processing API (6 endpoints) - Customer & Vendor payments
 - ✅ Comprehensive seed data with 40+ transactions
 - ✅ Redis caching layer - 60% query reduction
 - ✅ Performance optimizations
-- ✅ 150+ comprehensive tests with validation
-- 📋 **Next:** Payment Processing API (final Phase 2 task)
+- ✅ 160+ comprehensive tests with validation
 
-### 📈 **Live API Endpoints: 35 total**
+### 🚀 **Phase 3: Advanced Features (IN PROGRESS)**
+- ✅ **Bill Management API (7 endpoints)** - Accounts Payable 🎉 NEW!
+- [ ] CSV Import for Chart of Accounts
+- [ ] Bank Reconciliation
+- [ ] Advanced Financial Reports
+
+### 📈 **Live API Endpoints: 48 total**
 - Health & Status (1)
 - Authentication (4)
 - Chart of Accounts (7)
 - Transactions (5)
 - **Contacts (8)** ✅
 - **Invoices (6)** ✅
-- **Financial Reporting (4)** 🎉 NEW!
+- **Payments (6)** ✅
+- **Bills (7)** ✅ 🎉 NEW!
+- **Financial Reporting (4)** ✅
 
-### 🧪 **Test Coverage: 150+ tests (~92%)**
+### 🧪 **Test Coverage: 166+ tests (~93%)**
 - Auth: 19 tests
 - Accounts: 12 tests
 - Transactions: 15 tests
 - **Contacts: 20 tests** ✅
 - **Invoice Service & API: 20+ tests** ✅
-- **Financial Reporting: 39+ tests** 🎉 NEW!
+- **Payment Processing: 10 tests** ✅
+- **Bill Management: 6 tests** ✅ 🎉 NEW!
+- **Financial Reporting: 39+ tests** ✅
   - Integration tests: 8 scenarios
   - Unit tests: 15+ tests
   - Data validation tests: 6+ tests
@@ -122,8 +132,11 @@ cargo test
 cargo test --test auth_service_test        # Auth tests (19)
 cargo test --test account_service_test     # Account tests (12)
 cargo test --test transaction_service_test # Transaction tests (15)
-cargo test --test contact_service_test     # Contact tests (20) 🎉
-cargo test --test cache_test               # Cache tests (10) 🎉
+cargo test --test contact_service_test     # Contact tests (20)
+cargo test --test invoice_api_test          # Invoice tests (20+)
+cargo test --test payment_service_test      # Payment tests (10)
+cargo test --test bill_service_test         # Bill tests (6) 🎉 NEW!
+cargo test --test cache_test               # Cache tests (10)
 
 # Run with output
 cargo test -- --nocapture
@@ -217,7 +230,7 @@ GET /api/v1/contacts/customers
 POST /api/v1/contacts
 ```
 
-#### Invoices (6 endpoints) 🎉 NEW!
+#### Invoices (6 endpoints) ✅
 ```bash
 # Create invoice with line items
 POST /api/v1/invoices
@@ -232,32 +245,94 @@ PUT /api/v1/invoices/{id}/status
 GET /api/v1/invoices/overdue
 ```
 
+#### Payments (6 endpoints) ✅
+```bash
+# Create customer payment
+POST /api/v1/payments
+
+# List payments
+GET /api/v1/payments
+
+# Apply payment to invoices
+PUT /api/v1/payments/{id}/apply
+
+# Get unapplied payments
+GET /api/v1/payments/unapplied
+
+# Create vendor bill payment
+POST /api/v1/bill-payments
+```
+
+#### Bills (7 endpoints) ✅ 🎉 NEW!
+```bash
+# Create bill with line items
+POST /api/v1/bills
+
+# List bills
+GET /api/v1/bills
+
+# Get bill details
+GET /api/v1/bills/{id}
+
+# Update bill status
+PUT /api/v1/bills/{id}/status
+
+# Delete bill
+DELETE /api/v1/bills/{id}
+
+# Get overdue bills
+GET /api/v1/bills/overdue
+
+# Get vendor bills
+GET /api/v1/vendors/{id}/bills
+```
+
 ---
 
 ## 🚀 Next Development Steps
 
-### Phase 2 Remaining (30%)
-1. **Payment Processing API** (Starting next)
-   - Customer payment processing
-   - Payment application to invoices
-   - Balance updates
-   - Integration with transaction system
-   - Estimated: 2-3 days
+### ✅ Phase 2: COMPLETE! 🎉
+All core accounting features implemented:
+- ✅ Contact Management
+- ✅ Invoice Management
+- ✅ Payment Processing
+- ✅ Financial Reporting
+- ✅ 160+ comprehensive tests
+- ✅ 41 API endpoints live
 
-2. ✅ **Financial Reporting System** - COMPLETE! 🎉
-   - Trial Balance generation ✅
-   - Profit & Loss statements ✅
-   - Balance Sheet generation ✅
-   - A/R aging reports ✅
-   - Comprehensive seed data (40+ transactions) ✅
-   - Financial data integrity validation ✅
-   - 150+ comprehensive tests ✅
+### 🚀 Phase 3: Advanced Features (IN PROGRESS)
+- ✅ **Bill Management** - COMPLETE! 🎉
+  - 7 API endpoints for Accounts Payable
+  - Full CRUD with line items
+  - Status workflow and validation
+  - 6 comprehensive tests
+- [ ] **CSV Import** - Next
+1. **QuickBooks Import Tools**
+   - CSV/QBO file import
+   - Data mapping and validation
+   - Migration utilities
 
-### Phase 3: Advanced Features
-- QuickBooks import tools
-- Advanced financial reports
-- Data reconciliation
+2. **Advanced Financial Reports**
+   - Cash flow statements
+   - Budget vs Actual reports
+   - Custom report builder
+   - Multi-period comparisons
+
+3. **Bank Reconciliation**
+   - Bank statement import
+   - Automated matching
+   - Reconciliation workflow
+
+4. **Data Reconciliation**
+   - Account reconciliation tools
+   - Variance analysis
+   - Audit trails
+
+### Phase 4: Advanced Features
 - Multi-currency support
+- WebAssembly frontend (Leptos/Dioxus)
+- Advanced analytics
+- Mobile app
 
 ---
 
@@ -375,5 +450,6 @@ For questions about:
 
 ---
 
-*Last Updated: October 5, 2025*
+*Last Updated: October 7, 2025*
+*Phase 2 Complete! Phase 3 in progress with Bill Management complete!*
 *This guide is the single source of truth for LedgerForge development status.*

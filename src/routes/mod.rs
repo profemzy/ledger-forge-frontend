@@ -9,7 +9,7 @@ use utoipa_swagger_ui::SwaggerUi;
 
 use crate::{
     handlers,
-    services::{AuthService, AccountService, TransactionService, ContactService, InvoiceService, PaymentService, CacheService, ReportingService},
+    services::{AuthService, AccountService, TransactionService, ContactService, InvoiceService, PaymentService, BillService, CacheService, ReportingService},
     utils::HealthResponse
 };
 
@@ -23,6 +23,7 @@ pub struct AppState {
     pub contact_service: ContactService,
     pub invoice_service: InvoiceService,
     pub payment_service: PaymentService,
+    pub bill_service: BillService,
     pub reporting_service: ReportingService,
     pub cache_service: CacheService,
 }
@@ -59,7 +60,7 @@ pub async fn health_check(State(state): State<AppState>) -> Json<HealthResponse>
 }
 
 /// Create all application routes
-pub fn create_routes(pool: PgPool, auth_service: AuthService, account_service: AccountService, transaction_service: TransactionService, contact_service: ContactService, invoice_service: InvoiceService, payment_service: PaymentService, reporting_service: ReportingService, cache_service: CacheService) -> Router {
+pub fn create_routes(pool: PgPool, auth_service: AuthService, account_service: AccountService, transaction_service: TransactionService, contact_service: ContactService, invoice_service: InvoiceService, payment_service: PaymentService, bill_service: BillService, reporting_service: ReportingService, cache_service: CacheService) -> Router {
     let app_state = AppState {
         pool,
         auth_service,
@@ -68,6 +69,7 @@ pub fn create_routes(pool: PgPool, auth_service: AuthService, account_service: A
         contact_service,
         invoice_service,
         payment_service,
+        bill_service,
         reporting_service,
         cache_service,
     };
@@ -118,6 +120,14 @@ pub fn create_routes(pool: PgPool, auth_service: AuthService, account_service: A
         .route("/api/v1/payments/{id}/apply", put(handlers::apply_payment))
         .route("/api/v1/payments/unapplied", get(handlers::get_unapplied_payments))
         .route("/api/v1/bill-payments", post(handlers::create_bill_payment))
+        // Bill routes
+        .route("/api/v1/bills", get(handlers::list_bills))
+        .route("/api/v1/bills", post(handlers::create_bill))
+        .route("/api/v1/bills/{id}", get(handlers::get_bill))
+        .route("/api/v1/bills/{id}/status", put(handlers::update_bill_status))
+        .route("/api/v1/bills/{id}", delete(handlers::delete_bill))
+        .route("/api/v1/bills/overdue", get(handlers::get_overdue_bills))
+        .route("/api/v1/vendors/{id}/bills", get(handlers::get_vendor_bills))
         // Reporting routes
         .route("/api/v1/reports/trial-balance", get(handlers::get_trial_balance))
         .route("/api/v1/reports/profit-loss", get(handlers::get_profit_loss))

@@ -606,9 +606,9 @@ async fn setup_test_database() -> Result<sqlx::PgPool, sqlx::Error> {
 
     let pool = sqlx::PgPool::connect(&database_url).await?;
 
-    // Run the seed data migration
-    let seed_sql = include_str!("../migrations/20241220000000_financial_reporting_seed_data.sql");
-    sqlx::query(seed_sql).execute(&pool).await?;
+    // Use Rust seeding system instead of SQL migration
+    ledger_forge::seed::seed_database(&pool).await
+        .map_err(|e| sqlx::Error::Io(std::io::Error::new(std::io::ErrorKind::Other, e.to_string())))?;
 
     Ok(pool)
 }

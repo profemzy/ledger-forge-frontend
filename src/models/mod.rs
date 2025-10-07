@@ -14,9 +14,9 @@ pub use account::*;
 pub use transaction::*;
 pub use contact::*;
 pub use invoice::*;
+pub use bill::*;
 // Uncomment when implementing features:
 // pub use company::*;
-// pub use bill::*;
 pub use payment::*;
 // pub use item::*;
 pub use reporting::*;
