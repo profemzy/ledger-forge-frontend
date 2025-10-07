@@ -21,15 +21,16 @@ Replace QuickBooks with a bespoke accounting platform that offers:
 **Phase 3: Advanced Features** - 🚀 IN PROGRESS!
 
 ### 🎉 Latest Achievements (October 7, 2025) ✨
-**Bill Management System - PHASE 3 STARTED!**
+**CSV Import System - PHASE 3 MILESTONE!**
 - ✅ **Bill Management API with 7 endpoints** (Accounts Payable)
+- ✅ **CSV Import System with 2 endpoints** (Chart of Accounts) ✨ NEW!
 - ✅ **Bill CRUD operations** (Create, read, update, delete)
 - ✅ **Bill status workflow** (open → partial → paid → void)
-- ✅ **Overdue bill tracking** (Automatic aging)
-- ✅ **Vendor bill management** (Complete AP workflow)
-- ✅ **48 total API endpoints live** (+7 new bill endpoints)
-- ✅ **166+ comprehensive tests** (~93% coverage) (+6 new bill tests)
-- ✅ **Phase 3: Started with Bill Management!** 🚀
+- ✅ **CSV template download** (Pre-configured account structure)
+- ✅ **Hierarchical account import** (Parent-child relationships)
+- ✅ **50 total API endpoints live** (+9 new endpoints)
+- ✅ **177+ comprehensive tests** (~93% coverage) (+17 new tests)
+- ✅ **Phase 3: Major Progress!** 🚀
 
 ### Progress Checklist
 
@@ -68,13 +69,15 @@ Replace QuickBooks with a bespoke accounting platform that offers:
 - [x] **API integration testing** ✨
 
 **Phase 3 (🚀 In Progress):**
-- [x] **Bill Management API (7 endpoints)** ✨ NEW!
-- [x] **Bill CRUD operations** ✨ NEW!
-- [x] **Bill status workflow** ✨ NEW!
-- [x] **Overdue bill tracking** ✨ NEW!
-- [x] **166+ comprehensive tests** ✨ NEW!
-- [ ] **CSV Import for Chart of Accounts** (next)
-- [ ] **Bank Reconciliation**
+- [x] **Bill Management API (7 endpoints)** ✨
+- [x] **Bill CRUD operations** ✨
+- [x] **Bill status workflow** ✨
+- [x] **Overdue bill tracking** ✨
+- [x] **CSV Import for Chart of Accounts (2 endpoints)** ✨ NEW!
+- [x] **CSV template download** ✨ NEW!
+- [x] **Hierarchical account import** ✨ NEW!
+- [x] **177+ comprehensive tests** ✨
+- [ ] **Bank Reconciliation** (next)
 - [ ] **Advanced Financial Reports**
 
 ## 🏗️ Technology Stack
@@ -385,7 +388,7 @@ ledger-forge/
   - Payment method tracking (Check, Cash, Credit Card, etc.)
   - Redis caching for payment data
 
-- **Bill Management System** ✅ NEW!
+- **Bill Management System** ✅
   - Bill CRUD operations (7 endpoints)
   - Bill status workflow (open → partial → paid → void)
   - Overdue bill tracking and management
@@ -394,15 +397,25 @@ ledger-forge/
   - Payment validation on delete
   - Redis caching for bill data
 
+- **CSV Import System** ✅ NEW!
+  - Chart of Accounts CSV import (2 endpoints)
+  - CSV template download with sample data
+  - Hierarchical account import (parent-child)
+  - Two-pass import strategy
+  - Detailed error reporting with row numbers
+  - Flexible account type parsing (case-insensitive)
+  - Duplicate code prevention
+  - 11 comprehensive import tests
+
 ### Phase 2 Complete! Phase 3 In Progress! 🎉
 All core accounting features implemented. Now adding advanced features.
 
 ### Planned 📋
-- CSV Import for Chart of Accounts (in progress)
 - Bank reconciliation
-- QuickBooks data migration tools
+- QuickBooks data migration tools (expand CSV import)
 - WebAssembly frontend
 - Multi-currency support
+- Advanced financial analytics
 
 ## 📖 API Endpoints
 
@@ -641,6 +654,36 @@ All core accounting features implemented. Now adding advanced features.
     -H 'Authorization: Bearer <token>'
   ```
 
+### CSV Import (LIVE ✅) 🎉 NEW!
+- `POST /api/v1/import/accounts` - Import Chart of Accounts from CSV
+  ```bash
+  curl -X POST http://localhost:3000/api/v1/import/accounts \
+    -H 'Content-Type: text/csv' \
+    -H 'Authorization: Bearer <token>' \
+    --data-binary @chart_of_accounts.csv
+  ```
+- `GET /api/v1/import/accounts/template` - Download CSV template
+  ```bash
+  curl http://localhost:3000/api/v1/import/accounts/template \
+    -H 'Authorization: Bearer <token>' \
+    -o chart_of_accounts_template.csv
+  ```
+
+**CSV Template Format:**
+```csv
+code,name,account_type,parent_code,description
+1000,Cash,Asset,,Primary cash account
+1010,Checking Account,Asset,1000,Business checking account
+2000,Accounts Payable,Liability,,Vendor payables
+```
+
+**Import Features:**
+- Hierarchical account support (parent-child relationships)
+- Two-pass import (parents first, then children)
+- Detailed error reporting with row numbers
+- Flexible account type parsing (Asset, Liability, Equity, Revenue/Income, Expense)
+- Duplicate code prevention
+
 ## 🔐 Security
 
 - **Password Hashing:** Argon2 (recommended for 2025)
@@ -666,11 +709,11 @@ All core accounting features implemented. Now adding advanced features.
 
 ### Phase 3: Advanced Features (🚀 In Progress)
 - [x] Bill Management ✅
-- [ ] CSV Import for Chart of Accounts (next)
-- [ ] QuickBooks import tools
+- [x] CSV Import for Chart of Accounts ✅
+- [ ] Bank reconciliation (next)
+- [ ] QuickBooks import tools (expand CSV import)
 - [ ] Advanced reporting features
 - [ ] Data reconciliation
-- [ ] Bank reconciliation
 
 ### Phase 4: Advanced Features
 - [ ] Multi-currency
@@ -685,7 +728,7 @@ All core accounting features implemented. Now adding advanced features.
 
 ## 🧪 Testing
 
-**Test Coverage:** 166+ tests passing ✅ | ~93% coverage
+**Test Coverage:** 177+ tests passing ✅ | ~93% coverage
 
 ### Running Tests
 
@@ -700,7 +743,8 @@ cargo test --test transaction_service_test  # Transaction tests (15)
 cargo test --test contact_service_test      # Contact tests (20)
 cargo test --test invoice_api_test          # Invoice API tests (20+)
 cargo test --test payment_service_test      # Payment tests (10)
-cargo test --test bill_service_test         # Bill tests (6) 🎉 NEW!
+cargo test --test bill_service_test         # Bill tests (6)
+cargo test --test import_service_test       # Import tests (11) 🎉 NEW!
 cargo test --test cache_test                # Cache tests (10)
 cargo test --test migrations_test           # Database tests (7)
 cargo test --test financial_reporting_test     # Financial reporting integration tests
@@ -722,7 +766,8 @@ cargo test -- --test-threads=1
 - **Contact Unit Tests** (20 tests ✅) - Contact service, CRUD operations, validation
 - **Invoice Tests** (20+ tests ✅) - Invoice service, API endpoints, status workflow
 - **Payment Tests** (10 tests ✅) - Payment processing, applications, bill payments
-- **Bill Tests** (6 tests ✅) - Bill CRUD, status workflow, overdue tracking 🎉 NEW!
+- **Bill Tests** (6 tests ✅) - Bill CRUD, status workflow, overdue tracking
+- **Import Tests** (11 tests ✅) - CSV import, validation, error handling 🎉 NEW!
 - **Financial Reporting Tests** (39+ tests ✅) - Complete reporting system testing
   - Integration tests (8 scenarios) - End-to-end API testing
   - Unit tests (15+ tests) - Business logic validation
@@ -777,4 +822,4 @@ Proprietary - All rights reserved
 **Built with ❤️ and Rust** 🦀
 
 *Last Updated: October 7, 2025*
-*Latest: **Phase 3 Started!** - Bill Management System with 48 total API endpoints and 166+ comprehensive tests! 🎉*
+*Latest: **Phase 3 Progress!** - Bill Management & CSV Import with 50 total API endpoints and 177+ comprehensive tests! 🎉*

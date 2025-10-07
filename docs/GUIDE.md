@@ -1,8 +1,8 @@
 # LedgerForge Development Guide
 
 **Last Updated:** October 7, 2025
-**Current Phase:** Phase 2 - Core Features (✅ 100% COMPLETE!)
-**Status:** Production-ready with complete accounting system and comprehensive testing
+**Current Phase:** Phase 3 - Advanced Features (🚀 IN PROGRESS)
+**Status:** Production-ready with Bill Management & CSV Import complete
 
 ---
 
@@ -48,12 +48,12 @@ open http://localhost:3000/swagger-ui/
 - ✅ 160+ comprehensive tests with validation
 
 ### 🚀 **Phase 3: Advanced Features (IN PROGRESS)**
-- ✅ **Bill Management API (7 endpoints)** - Accounts Payable 🎉 NEW!
-- [ ] CSV Import for Chart of Accounts
-- [ ] Bank Reconciliation
+- ✅ **Bill Management API (7 endpoints)** - Accounts Payable ✨
+- ✅ **CSV Import System (2 endpoints)** - Chart of Accounts ✨ NEW!
+- [ ] Bank Reconciliation (next)
 - [ ] Advanced Financial Reports
 
-### 📈 **Live API Endpoints: 48 total**
+### 📈 **Live API Endpoints: 50 total**
 - Health & Status (1)
 - Authentication (4)
 - Chart of Accounts (7)
@@ -61,17 +61,19 @@ open http://localhost:3000/swagger-ui/
 - **Contacts (8)** ✅
 - **Invoices (6)** ✅
 - **Payments (6)** ✅
-- **Bills (7)** ✅ 🎉 NEW!
+- **Bills (7)** ✅
+- **Import (2)** ✅ 🎉 NEW!
 - **Financial Reporting (4)** ✅
 
-### 🧪 **Test Coverage: 166+ tests (~93%)**
+### 🧪 **Test Coverage: 177+ tests (~93%)**
 - Auth: 19 tests
 - Accounts: 12 tests
 - Transactions: 15 tests
 - **Contacts: 20 tests** ✅
 - **Invoice Service & API: 20+ tests** ✅
 - **Payment Processing: 10 tests** ✅
-- **Bill Management: 6 tests** ✅ 🎉 NEW!
+- **Bill Management: 6 tests** ✅
+- **CSV Import: 11 tests** ✅ 🎉 NEW!
 - **Financial Reporting: 39+ tests** ✅
   - Integration tests: 8 scenarios
   - Unit tests: 15+ tests
@@ -135,7 +137,8 @@ cargo test --test transaction_service_test # Transaction tests (15)
 cargo test --test contact_service_test     # Contact tests (20)
 cargo test --test invoice_api_test          # Invoice tests (20+)
 cargo test --test payment_service_test      # Payment tests (10)
-cargo test --test bill_service_test         # Bill tests (6) 🎉 NEW!
+cargo test --test bill_service_test         # Bill tests (6)
+cargo test --test import_service_test       # Import tests (11) 🎉 NEW!
 cargo test --test cache_test               # Cache tests (10)
 
 # Run with output
@@ -287,6 +290,41 @@ GET /api/v1/bills/overdue
 GET /api/v1/vendors/{id}/bills
 ```
 
+#### Import (2 endpoints) ✅ 🎉 NEW!
+```bash
+# Import Chart of Accounts from CSV
+POST /api/v1/import/accounts
+
+# Download CSV template
+GET /api/v1/import/accounts/template
+
+# Example: Import accounts
+curl -X POST http://localhost:3000/api/v1/import/accounts \
+  -H 'Content-Type: text/csv' \
+  -H 'Authorization: Bearer <token>' \
+  --data-binary @chart_of_accounts.csv
+
+# Example: Download template
+curl http://localhost:3000/api/v1/import/accounts/template \
+  -H 'Authorization: Bearer <token>' \
+  -o template.csv
+```
+
+**CSV Template Format:**
+```csv
+code,name,account_type,parent_code,description
+1000,Cash,Asset,,Primary cash account
+1010,Checking Account,Asset,1000,Business checking
+2000,Accounts Payable,Liability,,Vendor payables
+```
+
+**Import Features:**
+- Hierarchical account support (parent-child)
+- Two-pass import strategy
+- Detailed error reporting with row numbers
+- Flexible account type parsing (case-insensitive)
+- Duplicate code prevention
+
 ---
 
 ## 🚀 Next Development Steps
@@ -301,14 +339,26 @@ All core accounting features implemented:
 - ✅ 41 API endpoints live
 
 ### 🚀 Phase 3: Advanced Features (IN PROGRESS)
-- ✅ **Bill Management** - COMPLETE! 🎉
+- ✅ **Bill Management** - COMPLETE! ✨
   - 7 API endpoints for Accounts Payable
   - Full CRUD with line items
   - Status workflow and validation
   - 6 comprehensive tests
-- [ ] **CSV Import** - Next
-1. **QuickBooks Import Tools**
-   - CSV/QBO file import
+
+- ✅ **CSV Import for Chart of Accounts** - COMPLETE! 🎉
+  - 2 API endpoints (import + template)
+  - Hierarchical account import
+  - Two-pass import strategy
+  - Detailed error reporting
+  - 11 comprehensive tests
+
+1. **Bank Reconciliation** (Next Priority)
+   - Bank statement import
+   - Automated transaction matching
+   - Reconciliation workflow
+
+2. **QuickBooks Import Tools** (Expand CSV Import)
+   - Import contacts, invoices, bills
    - Data mapping and validation
    - Migration utilities
 
@@ -451,5 +501,5 @@ For questions about:
 ---
 
 *Last Updated: October 7, 2025*
-*Phase 2 Complete! Phase 3 in progress with Bill Management complete!*
+*Phase 3 in progress: Bill Management & CSV Import complete! Bank Reconciliation next.*
 *This guide is the single source of truth for LedgerForge development status.*
