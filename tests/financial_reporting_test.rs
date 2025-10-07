@@ -339,14 +339,14 @@ async fn test_reporting_with_empty_database() -> sqlx::Result<()> {
     let pool = create_empty_test_database().await?;
 
     // Initialize services for testing
+    let cache_service = CacheService::new("redis://localhost").expect("Failed to create cache service");
     let auth_service = AuthService::new("test-secret-key".to_string());
-    let account_service = AccountService::new_with_cache(CacheService::new(100));
-    let transaction_service = TransactionService::new_with_cache(CacheService::new(100));
-    let contact_service = ContactService::new_with_cache(CacheService::new(100));
-    let invoice_service = InvoiceService::new_with_cache(CacheService::new(100));
-    let payment_service = PaymentService::new_with_cache(CacheService::new(100));
-    let reporting_service = ReportingService::new_with_cache(CacheService::new(100));
-    let cache_service = CacheService::new(100);
+    let account_service = AccountService::new_with_cache(cache_service.clone());
+    let transaction_service = TransactionService::new_with_cache(cache_service.clone());
+    let contact_service = ContactService::new_with_cache(cache_service.clone());
+    let invoice_service = InvoiceService::new_with_cache(cache_service.clone());
+    let payment_service = PaymentService::new_with_cache(cache_service.clone());
+    let reporting_service = ReportingService::new_with_cache(cache_service.clone());
 
     // Create test app
     let app = create_routes(
@@ -458,14 +458,14 @@ async fn setup_test_database() -> sqlx::Result<(sqlx::PgPool, axum::Router)> {
     sqlx::query(seed_sql).execute(&pool).await?;
 
     // Initialize services for testing
+    let cache_service = CacheService::new("redis://localhost").expect("Failed to create cache service");
     let auth_service = AuthService::new("test-secret-key".to_string());
-    let account_service = AccountService::new_with_cache(CacheService::new(100));
-    let transaction_service = TransactionService::new_with_cache(CacheService::new(100));
-    let contact_service = ContactService::new_with_cache(CacheService::new(100));
-    let invoice_service = InvoiceService::new_with_cache(CacheService::new(100));
-    let payment_service = PaymentService::new_with_cache(CacheService::new(100));
-    let reporting_service = ReportingService::new_with_cache(CacheService::new(100));
-    let cache_service = CacheService::new(100);
+    let account_service = AccountService::new_with_cache(cache_service.clone());
+    let transaction_service = TransactionService::new_with_cache(cache_service.clone());
+    let contact_service = ContactService::new_with_cache(cache_service.clone());
+    let invoice_service = InvoiceService::new_with_cache(cache_service.clone());
+    let payment_service = PaymentService::new_with_cache(cache_service.clone());
+    let reporting_service = ReportingService::new_with_cache(cache_service.clone());
 
     // Create test app
     let app = create_routes(

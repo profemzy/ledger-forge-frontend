@@ -10,10 +10,10 @@ use ledger_forge::utils::AppError;
 /// Unit tests for the reporting service methods
 /// These tests validate the business logic and data transformation functions
 
-#[sqlx::test]
-async fn test_reporting_service_trial_balance_generation() -> sqlx::Result<()> {
+#[tokio::test]
+async fn test_reporting_service_trial_balance_generation() -> Result<(), sqlx::Error> {
     let pool = setup_test_database().await?;
-    let cache_service = CacheService::new(100);
+    let cache_service = CacheService::new("redis://localhost").expect("Failed to create cache service");
     let reporting_service = ReportingService::new_with_cache(cache_service);
 
     // Test trial balance generation for a specific date
@@ -23,7 +23,13 @@ async fn test_reporting_service_trial_balance_generation() -> sqlx::Result<()> {
 
     let trial_balance = reporting_service
         .generate_trial_balance(&pool, date_request.clone())
-        .await?;
+        .await
+        .map_err(|e| match e {
+            AppError::DatabaseError(msg) => sqlx::Error::Protocol(format!("{}", msg)),
+            AppError::NotFound(msg) => sqlx::Error::RowNotFound,
+            AppError::InternalError(msg) => sqlx::Error::Protocol(format!("{}", msg)),
+            _ => sqlx::Error::Protocol(format!("Unexpected error: {}", e)),
+        })?;
 
     // Verify trial balance structure
     assert_eq!(trial_balance.as_of_date, date_request.as_of_date);
@@ -58,10 +64,10 @@ async fn test_reporting_service_trial_balance_generation() -> sqlx::Result<()> {
     Ok(())
 }
 
-#[sqlx::test]
-async fn test_reporting_service_trial_balance_earlier_date() -> sqlx::Result<()> {
+#[tokio::test]
+async fn test_reporting_service_trial_balance_earlier_date() -> Result<(), sqlx::Error> {
     let pool = setup_test_database().await?;
-    let cache_service = CacheService::new(100);
+    let cache_service = CacheService::new("redis://localhost").expect("Failed to create cache service");
     let reporting_service = ReportingService::new_with_cache(cache_service);
 
     // Test trial balance for an earlier date (should show fewer transactions)
@@ -71,7 +77,13 @@ async fn test_reporting_service_trial_balance_earlier_date() -> sqlx::Result<()>
 
     let trial_balance = reporting_service
         .generate_trial_balance(&pool, date_request)
-        .await?;
+        .await
+        .map_err(|e| match e {
+            AppError::DatabaseError(msg) => sqlx::Error::Protocol(format!("{}", msg)),
+            AppError::NotFound(msg) => sqlx::Error::RowNotFound,
+            AppError::InternalError(msg) => sqlx::Error::Protocol(format!("{}", msg)),
+            _ => sqlx::Error::Protocol(format!("Unexpected error: {}", e)),
+        })?;
 
     // Verify structure
     assert!(trial_balance.entries.len() > 0);
@@ -83,7 +95,13 @@ async fn test_reporting_service_trial_balance_earlier_date() -> sqlx::Result<()>
     };
     let year_end_balance = reporting_service
         .generate_trial_balance(&pool, year_end_request)
-        .await?;
+        .await
+        .map_err(|e| match e {
+            AppError::DatabaseError(msg) => sqlx::Error::Protocol(format!("{}", msg)),
+            AppError::NotFound(msg) => sqlx::Error::RowNotFound,
+            AppError::InternalError(msg) => sqlx::Error::Protocol(format!("{}", msg)),
+            _ => sqlx::Error::Protocol(format!("Unexpected error: {}", e)),
+        })?;
 
     // The total amounts should be different for different dates
     assert!(trial_balance.total_debits != year_end_balance.total_debits ||
@@ -92,10 +110,10 @@ async fn test_reporting_service_trial_balance_earlier_date() -> sqlx::Result<()>
     Ok(())
 }
 
-#[sqlx::test]
-async fn test_reporting_service_profit_loss_generation() -> sqlx::Result<()> {
+#[tokio::test]
+async fn test_reporting_service_profit_loss_generation() -> Result<(), sqlx::Error> {
     let pool = setup_test_database().await?;
-    let cache_service = CacheService::new(100);
+    let cache_service = CacheService::new("redis://localhost").expect("Failed to create cache service");
     let reporting_service = ReportingService::new_with_cache(cache_service);
 
     // Test profit and loss for full year
@@ -106,7 +124,13 @@ async fn test_reporting_service_profit_loss_generation() -> sqlx::Result<()> {
 
     let profit_loss = reporting_service
         .generate_profit_loss(&pool, date_range.clone())
-        .await?;
+        .await
+        .map_err(|e| match e {
+            AppError::DatabaseError(msg) => sqlx::Error::Protocol(format!("{}", msg)),
+            AppError::NotFound(msg) => sqlx::Error::RowNotFound,
+            AppError::InternalError(msg) => sqlx::Error::Protocol(format!("{}", msg)),
+            _ => sqlx::Error::Protocol(format!("Unexpected error: {}", e)),
+        })?;
 
     // Verify P&L structure
     assert_eq!(profit_loss.period_start, date_range.start_date);
@@ -144,10 +168,10 @@ async fn test_reporting_service_profit_loss_generation() -> sqlx::Result<()> {
     Ok(())
 }
 
-#[sqlx::test]
-async fn test_reporting_service_profit_loss_quarterly() -> sqlx::Result<()> {
+#[tokio::test]
+async fn test_reporting_service_profit_loss_quarterly() -> Result<(), sqlx::Error> {
     let pool = setup_test_database().await?;
-    let cache_service = CacheService::new(100);
+    let cache_service = CacheService::new("redis://localhost").expect("Failed to create cache service");
     let reporting_service = ReportingService::new_with_cache(cache_service);
 
     // Test Q1 profit and loss
@@ -158,7 +182,13 @@ async fn test_reporting_service_profit_loss_quarterly() -> sqlx::Result<()> {
 
     let q1_profit_loss = reporting_service
         .generate_profit_loss(&pool, q1_range)
-        .await?;
+        .await
+        .map_err(|e| match e {
+            AppError::DatabaseError(msg) => sqlx::Error::Protocol(format!("{}", msg)),
+            AppError::NotFound(msg) => sqlx::Error::RowNotFound,
+            AppError::InternalError(msg) => sqlx::Error::Protocol(format!("{}", msg)),
+            _ => sqlx::Error::Protocol(format!("Unexpected error: {}", e)),
+        })?;
 
     // Test Q2 profit and loss
     let q2_range = DateRangeRequest {
@@ -168,7 +198,13 @@ async fn test_reporting_service_profit_loss_quarterly() -> sqlx::Result<()> {
 
     let q2_profit_loss = reporting_service
         .generate_profit_loss(&pool, q2_range)
-        .await?;
+        .await
+        .map_err(|e| match e {
+            AppError::DatabaseError(msg) => sqlx::Error::Protocol(format!("{}", msg)),
+            AppError::NotFound(msg) => sqlx::Error::RowNotFound,
+            AppError::InternalError(msg) => sqlx::Error::Protocol(format!("{}", msg)),
+            _ => sqlx::Error::Protocol(format!("Unexpected error: {}", e)),
+        })?;
 
     // Verify both quarters have data
     assert!(q1_profit_loss.total_revenue >= Decimal::ZERO);
@@ -186,10 +222,10 @@ async fn test_reporting_service_profit_loss_quarterly() -> sqlx::Result<()> {
     Ok(())
 }
 
-#[sqlx::test]
-async fn test_reporting_service_balance_sheet_generation() -> sqlx::Result<()> {
+#[tokio::test]
+async fn test_reporting_service_balance_sheet_generation() -> Result<(), sqlx::Error> {
     let pool = setup_test_database().await?;
-    let cache_service = CacheService::new(100);
+    let cache_service = CacheService::new("redis://localhost").expect("Failed to create cache service");
     let reporting_service = ReportingService::new_with_cache(cache_service);
 
     // Test balance sheet as of year-end
@@ -199,7 +235,13 @@ async fn test_reporting_service_balance_sheet_generation() -> sqlx::Result<()> {
 
     let balance_sheet = reporting_service
         .generate_balance_sheet(&pool, date_request.clone())
-        .await?;
+        .await
+        .map_err(|e| match e {
+            AppError::DatabaseError(msg) => sqlx::Error::Protocol(format!("{}", msg)),
+            AppError::NotFound(msg) => sqlx::Error::RowNotFound,
+            AppError::InternalError(msg) => sqlx::Error::Protocol(format!("{}", msg)),
+            _ => sqlx::Error::Protocol(format!("Unexpected error: {}", e)),
+        })?;
 
     // Verify balance sheet structure
     assert_eq!(balance_sheet.as_of_date, date_request.as_of_date);
@@ -245,10 +287,10 @@ async fn test_reporting_service_balance_sheet_generation() -> sqlx::Result<()> {
     Ok(())
 }
 
-#[sqlx::test]
-async fn test_reporting_service_balance_sheet_different_dates() -> sqlx::Result<()> {
+#[tokio::test]
+async fn test_reporting_service_balance_sheet_different_dates() -> Result<(), sqlx::Error> {
     let pool = setup_test_database().await?;
-    let cache_service = CacheService::new(100);
+    let cache_service = CacheService::new("redis://localhost").expect("Failed to create cache service");
     let reporting_service = ReportingService::new_with_cache(cache_service);
 
     // Compare balance sheets at different points in time
@@ -262,11 +304,23 @@ async fn test_reporting_service_balance_sheet_different_dates() -> sqlx::Result<
 
     let mid_year_bs = reporting_service
         .generate_balance_sheet(&pool, mid_year_request)
-        .await?;
+        .await
+        .map_err(|e| match e {
+            AppError::DatabaseError(msg) => sqlx::Error::Protocol(format!("{}", msg)),
+            AppError::NotFound(msg) => sqlx::Error::RowNotFound,
+            AppError::InternalError(msg) => sqlx::Error::Protocol(format!("{}", msg)),
+            _ => sqlx::Error::Protocol(format!("Unexpected error: {}", e)),
+        })?;
 
     let year_end_bs = reporting_service
         .generate_balance_sheet(&pool, year_end_request)
-        .await?;
+        .await
+        .map_err(|e| match e {
+            AppError::DatabaseError(msg) => sqlx::Error::Protocol(format!("{}", msg)),
+            AppError::NotFound(msg) => sqlx::Error::RowNotFound,
+            AppError::InternalError(msg) => sqlx::Error::Protocol(format!("{}", msg)),
+            _ => sqlx::Error::Protocol(format!("Unexpected error: {}", e)),
+        })?;
 
     // Both should be balanced
     let mid_year_balance = mid_year_bs.total_assets -
@@ -285,10 +339,10 @@ async fn test_reporting_service_balance_sheet_different_dates() -> sqlx::Result<
     Ok(())
 }
 
-#[sqlx::test]
-async fn test_reporting_service_ar_aging_generation() -> sqlx::Result<()> {
+#[tokio::test]
+async fn test_reporting_service_ar_aging_generation() -> Result<(), sqlx::Error> {
     let pool = setup_test_database().await?;
-    let cache_service = CacheService::new(100);
+    let cache_service = CacheService::new("redis://localhost").expect("Failed to create cache service");
     let reporting_service = ReportingService::new_with_cache(cache_service);
 
     // Test AR aging as of year-end
@@ -298,7 +352,13 @@ async fn test_reporting_service_ar_aging_generation() -> sqlx::Result<()> {
 
     let ar_aging = reporting_service
         .generate_ar_aging(&pool, date_request.clone())
-        .await?;
+        .await
+        .map_err(|e| match e {
+            AppError::DatabaseError(msg) => sqlx::Error::Protocol(format!("{}", msg)),
+            AppError::NotFound(msg) => sqlx::Error::RowNotFound,
+            AppError::InternalError(msg) => sqlx::Error::Protocol(format!("{}", msg)),
+            _ => sqlx::Error::Protocol(format!("Unexpected error: {}", e)),
+        })?;
 
     // Verify AR aging structure
     assert_eq!(ar_aging.as_of_date, date_request.as_of_date);
@@ -331,10 +391,10 @@ async fn test_reporting_service_ar_aging_generation() -> sqlx::Result<()> {
     Ok(())
 }
 
-#[sqlx::test]
-async fn test_reporting_service_cache_functionality() -> sqlx::Result<()> {
+#[tokio::test]
+async fn test_reporting_service_cache_functionality() -> Result<(), sqlx::Error> {
     let pool = setup_test_database().await?;
-    let cache_service = CacheService::new(100);
+    let cache_service = CacheService::new("redis://localhost").expect("Failed to create cache service");
     let reporting_service = ReportingService::new_with_cache(cache_service);
 
     let date_request = DateRequest {
@@ -345,14 +405,26 @@ async fn test_reporting_service_cache_functionality() -> sqlx::Result<()> {
     let start1 = std::time::Instant::now();
     let trial_balance1 = reporting_service
         .generate_trial_balance(&pool, date_request.clone())
-        .await?;
+        .await
+        .map_err(|e| match e {
+            AppError::DatabaseError(msg) => sqlx::Error::Protocol(format!("{}", msg)),
+            AppError::NotFound(msg) => sqlx::Error::RowNotFound,
+            AppError::InternalError(msg) => sqlx::Error::Protocol(format!("{}", msg)),
+            _ => sqlx::Error::Protocol(format!("Unexpected error: {}", e)),
+        })?;
     let duration1 = start1.elapsed();
 
     // Second call should use cache (faster)
     let start2 = std::time::Instant::now();
     let trial_balance2 = reporting_service
         .generate_trial_balance(&pool, date_request)
-        .await?;
+        .await
+        .map_err(|e| match e {
+            AppError::DatabaseError(msg) => sqlx::Error::Protocol(format!("{}", msg)),
+            AppError::NotFound(msg) => sqlx::Error::RowNotFound,
+            AppError::InternalError(msg) => sqlx::Error::Protocol(format!("{}", msg)),
+            _ => sqlx::Error::Protocol(format!("Unexpected error: {}", e)),
+        })?;
     let duration2 = start2.elapsed();
 
     // Results should be identical
@@ -368,10 +440,10 @@ async fn test_reporting_service_cache_functionality() -> sqlx::Result<()> {
     Ok(())
 }
 
-#[sqlx::test]
-async fn test_reporting_service_invalid_date_handling() -> sqlx::Result<()> {
+#[tokio::test]
+async fn test_reporting_service_invalid_date_handling() -> Result<(), sqlx::Error> {
     let pool = setup_test_database().await?;
-    let cache_service = CacheService::new(100);
+    let cache_service = CacheService::new("redis://localhost").expect("Failed to create cache service");
     let reporting_service = ReportingService::new_with_cache(cache_service);
 
     // Test with a date before any transactions exist
@@ -381,7 +453,13 @@ async fn test_reporting_service_invalid_date_handling() -> sqlx::Result<()> {
 
     let trial_balance = reporting_service
         .generate_trial_balance(&pool, early_date_request)
-        .await?;
+        .await
+        .map_err(|e| match e {
+            AppError::DatabaseError(msg) => sqlx::Error::Protocol(format!("{}", msg)),
+            AppError::NotFound(msg) => sqlx::Error::RowNotFound,
+            AppError::InternalError(msg) => sqlx::Error::Protocol(format!("{}", msg)),
+            _ => sqlx::Error::Protocol(format!("Unexpected error: {}", e)),
+        })?;
 
     // Should return empty trial balance
     assert_eq!(trial_balance.as_of_date, NaiveDate::from_ymd_opt(2023, 12, 31).unwrap());
@@ -393,10 +471,10 @@ async fn test_reporting_service_invalid_date_handling() -> sqlx::Result<()> {
     Ok(())
 }
 
-#[sqlx::test]
-async fn test_reporting_service_date_range_edge_cases() -> sqlx::Result<()> {
+#[tokio::test]
+async fn test_reporting_service_date_range_edge_cases() -> Result<(), sqlx::Error> {
     let pool = setup_test_database().await?;
-    let cache_service = CacheService::new(100);
+    let cache_service = CacheService::new("redis://localhost").expect("Failed to create cache service");
     let reporting_service = ReportingService::new_with_cache(cache_service);
 
     // Test with same start and end date
@@ -407,7 +485,13 @@ async fn test_reporting_service_date_range_edge_cases() -> sqlx::Result<()> {
 
     let profit_loss = reporting_service
         .generate_profit_loss(&pool, single_day_range)
-        .await?;
+        .await
+        .map_err(|e| match e {
+            AppError::DatabaseError(msg) => sqlx::Error::Protocol(format!("{}", msg)),
+            AppError::NotFound(msg) => sqlx::Error::RowNotFound,
+            AppError::InternalError(msg) => sqlx::Error::Protocol(format!("{}", msg)),
+            _ => sqlx::Error::Protocol(format!("Unexpected error: {}", e)),
+        })?;
 
     // Should handle single day ranges correctly
     assert_eq!(profit_loss.period_start, profit_loss.period_end);
@@ -421,7 +505,13 @@ async fn test_reporting_service_date_range_edge_cases() -> sqlx::Result<()> {
 
     let empty_profit_loss = reporting_service
         .generate_profit_loss(&pool, empty_range)
-        .await?;
+        .await
+        .map_err(|e| match e {
+            AppError::DatabaseError(msg) => sqlx::Error::Protocol(format!("{}", msg)),
+            AppError::NotFound(msg) => sqlx::Error::RowNotFound,
+            AppError::InternalError(msg) => sqlx::Error::Protocol(format!("{}", msg)),
+            _ => sqlx::Error::Protocol(format!("Unexpected error: {}", e)),
+        })?;
 
     // Should return zero values for periods with no transactions
     assert_eq!(empty_profit_loss.total_revenue, Decimal::ZERO);
@@ -433,10 +523,10 @@ async fn test_reporting_service_date_range_edge_cases() -> sqlx::Result<()> {
     Ok(())
 }
 
-#[sqlx::test]
-async fn test_reporting_service_comprehensive_financial_validation() -> sqlx::Result<()> {
+#[tokio::test]
+async fn test_reporting_service_comprehensive_financial_validation() -> Result<(), sqlx::Error> {
     let pool = setup_test_database().await?;
-    let cache_service = CacheService::new(100);
+    let cache_service = CacheService::new("redis://localhost").expect("Failed to create cache service");
     let reporting_service = ReportingService::new_with_cache(cache_service);
 
     // Generate all reports for year-end
@@ -451,15 +541,33 @@ async fn test_reporting_service_comprehensive_financial_validation() -> sqlx::Re
 
     let trial_balance = reporting_service
         .generate_trial_balance(&pool, date_request.clone())
-        .await?;
+        .await
+        .map_err(|e| match e {
+            AppError::DatabaseError(msg) => sqlx::Error::Protocol(format!("{}", msg)),
+            AppError::NotFound(msg) => sqlx::Error::RowNotFound,
+            AppError::InternalError(msg) => sqlx::Error::Protocol(format!("{}", msg)),
+            _ => sqlx::Error::Protocol(format!("Unexpected error: {}", e)),
+        })?;
 
     let profit_loss = reporting_service
         .generate_profit_loss(&pool, date_range)
-        .await?;
+        .await
+        .map_err(|e| match e {
+            AppError::DatabaseError(msg) => sqlx::Error::Protocol(format!("{}", msg)),
+            AppError::NotFound(msg) => sqlx::Error::RowNotFound,
+            AppError::InternalError(msg) => sqlx::Error::Protocol(format!("{}", msg)),
+            _ => sqlx::Error::Protocol(format!("Unexpected error: {}", e)),
+        })?;
 
     let balance_sheet = reporting_service
         .generate_balance_sheet(&pool, date_request)
-        .await?;
+        .await
+        .map_err(|e| match e {
+            AppError::DatabaseError(msg) => sqlx::Error::Protocol(format!("{}", msg)),
+            AppError::NotFound(msg) => sqlx::Error::RowNotFound,
+            AppError::InternalError(msg) => sqlx::Error::Protocol(format!("{}", msg)),
+            _ => sqlx::Error::Protocol(format!("Unexpected error: {}", e)),
+        })?;
 
     // Comprehensive validation
     // 1. Trial balance should be balanced
@@ -492,7 +600,7 @@ async fn test_reporting_service_comprehensive_financial_validation() -> sqlx::Re
 }
 
 /// Helper function to set up test database with seed data
-async fn setup_test_database() -> sqlx::Result<sqlx::PgPool> {
+async fn setup_test_database() -> Result<sqlx::PgPool, sqlx::Error> {
     let database_url = std::env::var("TEST_DATABASE_URL")
         .unwrap_or_else(|_| "postgres://postgres:password@localhost:5432/ledger_forge_test".to_string());
 

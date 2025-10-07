@@ -83,7 +83,7 @@ pub struct AccountsReceivableAging {
     pub buckets: Vec<AgingBucket>,
 }
 
-#[derive(Debug, Deserialize, Validate, ToSchema)]
+#[derive(Debug, Deserialize, Validate, ToSchema, Clone)]
 pub struct DateRangeRequest {
     #[schema(example = "2023-01-01")]
     pub start_date: NaiveDate,
@@ -92,7 +92,7 @@ pub struct DateRangeRequest {
     pub end_date: NaiveDate,
 }
 
-#[derive(Debug, Deserialize, Validate, ToSchema)]
+#[derive(Debug, Deserialize, Validate, ToSchema, Clone)]
 pub struct DateRequest {
     #[schema(example = "2023-12-31")]
     pub as_of_date: NaiveDate,
