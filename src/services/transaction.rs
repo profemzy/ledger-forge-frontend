@@ -148,27 +148,28 @@ impl TransactionService {
     ) -> Result<Vec<Transaction>> {
         let mut query = String::from(
             r#"
-            SELECT id, transaction_date, description, reference_number, contact_id, company_id,
-                   journal_type, status, created_by, created_at, updated_at
-            FROM transactions
+            SELECT 
+                t.id, t.transaction_date, t.description, t.reference_number, t.contact_id, t.company_id,
+                t.journal_type, t.status, t.created_by, t.created_at, t.updated_at
+            FROM transactions t
             WHERE 1=1
             "#
         );
 
         // Add filters
         if status.is_some() {
-            query.push_str(" AND status = $1");
+            query.push_str(" AND t.status = $1");
         }
 
         if company_id.is_some() {
             if status.is_some() {
-                query.push_str(" AND company_id = $2");
+                query.push_str(" AND t.company_id = $2");
             } else {
-                query.push_str(" AND company_id = $1");
+                query.push_str(" AND t.company_id = $1");
             }
         }
 
-        query.push_str(" ORDER BY transaction_date DESC, created_at DESC");
+        query.push_str(" ORDER BY t.transaction_date DESC, t.created_at DESC");
 
         // Add limit
         if limit.is_some() {
