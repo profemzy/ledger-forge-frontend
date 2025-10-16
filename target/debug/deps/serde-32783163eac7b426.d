@@ -1,0 +1,14 @@
+/home/profemzy/playground/ledger-forge/frontend/target/debug/deps/serde-32783163eac7b426.d: /home/profemzy/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/serde-1.0.228/src/lib.rs /home/profemzy/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/serde-1.0.228/src/integer128.rs /home/profemzy/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/serde-1.0.228/src/private/mod.rs /home/profemzy/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/serde-1.0.228/src/private/de.rs /home/profemzy/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/serde-1.0.228/src/private/ser.rs /home/profemzy/playground/ledger-forge/frontend/target/debug/build/serde-fef89be5e0aedca4/out/private.rs
+
+/home/profemzy/playground/ledger-forge/frontend/target/debug/deps/libserde-32783163eac7b426.rlib: /home/profemzy/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/serde-1.0.228/src/lib.rs /home/profemzy/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/serde-1.0.228/src/integer128.rs /home/profemzy/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/serde-1.0.228/src/private/mod.rs /home/profemzy/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/serde-1.0.228/src/private/de.rs /home/profemzy/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/serde-1.0.228/src/private/ser.rs /home/profemzy/playground/ledger-forge/frontend/target/debug/build/serde-fef89be5e0aedca4/out/private.rs
+
+/home/profemzy/playground/ledger-forge/frontend/target/debug/deps/libserde-32783163eac7b426.rmeta: /home/profemzy/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/serde-1.0.228/src/lib.rs /home/profemzy/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/serde-1.0.228/src/integer128.rs /home/profemzy/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/serde-1.0.228/src/private/mod.rs /home/profemzy/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/serde-1.0.228/src/private/de.rs /home/profemzy/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/serde-1.0.228/src/private/ser.rs /home/profemzy/playground/ledger-forge/frontend/target/debug/build/serde-fef89be5e0aedca4/out/private.rs
+
+/home/profemzy/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/serde-1.0.228/src/lib.rs:
+/home/profemzy/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/serde-1.0.228/src/integer128.rs:
+/home/profemzy/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/serde-1.0.228/src/private/mod.rs:
+/home/profemzy/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/serde-1.0.228/src/private/de.rs:
+/home/profemzy/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/serde-1.0.228/src/private/ser.rs:
+/home/profemzy/playground/ledger-forge/frontend/target/debug/build/serde-fef89be5e0aedca4/out/private.rs:
+
+# env-dep:OUT_DIR=/home/profemzy/playground/ledger-forge/frontend/target/debug/build/serde-fef89be5e0aedca4/out

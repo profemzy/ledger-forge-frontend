@@ -1,0 +1,10 @@
+/home/profemzy/playground/ledger-forge/frontend/target/release/deps/quote_use_macros-796f57e37c7beee0.d: /home/profemzy/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/quote-use-macros-0.8.4/src/lib.rs /home/profemzy/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/quote-use-macros-0.8.4/src/prelude.rs /home/profemzy/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/quote-use-macros-0.8.4/src/use_parser.rs /home/profemzy/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/quote-use-macros-0.8.4/src/prelude/core.rs /home/profemzy/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/quote-use-macros-0.8.4/src/prelude/std.rs /home/profemzy/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/quote-use-macros-0.8.4/src/prelude/2021.rs
+
+/home/profemzy/playground/ledger-forge/frontend/target/release/deps/libquote_use_macros-796f57e37c7beee0.so: /home/profemzy/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/quote-use-macros-0.8.4/src/lib.rs /home/profemzy/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/quote-use-macros-0.8.4/src/prelude.rs /home/profemzy/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/quote-use-macros-0.8.4/src/use_parser.rs /home/profemzy/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/quote-use-macros-0.8.4/src/prelude/core.rs /home/profemzy/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/quote-use-macros-0.8.4/src/prelude/std.rs /home/profemzy/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/quote-use-macros-0.8.4/src/prelude/2021.rs
+
+/home/profemzy/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/quote-use-macros-0.8.4/src/lib.rs:
+/home/profemzy/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/quote-use-macros-0.8.4/src/prelude.rs:
+/home/profemzy/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/quote-use-macros-0.8.4/src/use_parser.rs:
+/home/profemzy/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/quote-use-macros-0.8.4/src/prelude/core.rs:
+/home/profemzy/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/quote-use-macros-0.8.4/src/prelude/std.rs:
+/home/profemzy/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/quote-use-macros-0.8.4/src/prelude/2021.rs:

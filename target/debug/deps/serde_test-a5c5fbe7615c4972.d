@@ -1,0 +1,11 @@
+/home/profemzy/playground/ledger-forge/frontend/target/debug/deps/serde_test-a5c5fbe7615c4972.d: /home/profemzy/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/serde_test-1.0.177/src/lib.rs /home/profemzy/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/serde_test-1.0.177/src/assert.rs /home/profemzy/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/serde_test-1.0.177/src/configure.rs /home/profemzy/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/serde_test-1.0.177/src/de.rs /home/profemzy/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/serde_test-1.0.177/src/error.rs /home/profemzy/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/serde_test-1.0.177/src/ser.rs /home/profemzy/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/serde_test-1.0.177/src/token.rs
+
+/home/profemzy/playground/ledger-forge/frontend/target/debug/deps/libserde_test-a5c5fbe7615c4972.rmeta: /home/profemzy/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/serde_test-1.0.177/src/lib.rs /home/profemzy/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/serde_test-1.0.177/src/assert.rs /home/profemzy/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/serde_test-1.0.177/src/configure.rs /home/profemzy/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/serde_test-1.0.177/src/de.rs /home/profemzy/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/serde_test-1.0.177/src/error.rs /home/profemzy/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/serde_test-1.0.177/src/ser.rs /home/profemzy/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/serde_test-1.0.177/src/token.rs
+
+/home/profemzy/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/serde_test-1.0.177/src/lib.rs:
+/home/profemzy/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/serde_test-1.0.177/src/assert.rs:
+/home/profemzy/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/serde_test-1.0.177/src/configure.rs:
+/home/profemzy/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/serde_test-1.0.177/src/de.rs:
+/home/profemzy/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/serde_test-1.0.177/src/error.rs:
+/home/profemzy/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/serde_test-1.0.177/src/ser.rs:
+/home/profemzy/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/serde_test-1.0.177/src/token.rs:

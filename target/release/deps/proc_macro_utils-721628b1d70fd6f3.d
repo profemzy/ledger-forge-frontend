@@ -1,0 +1,10 @@
+/home/profemzy/playground/ledger-forge/frontend/target/release/deps/proc_macro_utils-721628b1d70fd6f3.d: /home/profemzy/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/proc-macro-utils-0.10.0/src/lib.rs /home/profemzy/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/proc-macro-utils-0.10.0/src/parser.rs /home/profemzy/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/proc-macro-utils-0.10.0/src/assert.rs /home/profemzy/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/proc-macro-utils-0.10.0/src/__private.rs
+
+/home/profemzy/playground/ledger-forge/frontend/target/release/deps/libproc_macro_utils-721628b1d70fd6f3.rlib: /home/profemzy/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/proc-macro-utils-0.10.0/src/lib.rs /home/profemzy/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/proc-macro-utils-0.10.0/src/parser.rs /home/profemzy/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/proc-macro-utils-0.10.0/src/assert.rs /home/profemzy/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/proc-macro-utils-0.10.0/src/__private.rs
+
+/home/profemzy/playground/ledger-forge/frontend/target/release/deps/libproc_macro_utils-721628b1d70fd6f3.rmeta: /home/profemzy/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/proc-macro-utils-0.10.0/src/lib.rs /home/profemzy/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/proc-macro-utils-0.10.0/src/parser.rs /home/profemzy/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/proc-macro-utils-0.10.0/src/assert.rs /home/profemzy/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/proc-macro-utils-0.10.0/src/__private.rs
+
+/home/profemzy/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/proc-macro-utils-0.10.0/src/lib.rs:
+/home/profemzy/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/proc-macro-utils-0.10.0/src/parser.rs:
+/home/profemzy/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/proc-macro-utils-0.10.0/src/assert.rs:
+/home/profemzy/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/proc-macro-utils-0.10.0/src/__private.rs:

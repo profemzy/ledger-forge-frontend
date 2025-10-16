@@ -1,0 +1,11 @@
+/home/profemzy/playground/ledger-forge/frontend/target/debug/deps/slotmap-fbcd67747183e32a.d: /home/profemzy/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/slotmap-1.0.7/src/lib.rs /home/profemzy/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/slotmap-1.0.7/src/basic.rs /home/profemzy/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/slotmap-1.0.7/src/dense.rs /home/profemzy/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/slotmap-1.0.7/src/hop.rs /home/profemzy/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/slotmap-1.0.7/src/secondary.rs /home/profemzy/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/slotmap-1.0.7/src/sparse_secondary.rs /home/profemzy/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/slotmap-1.0.7/src/util.rs
+
+/home/profemzy/playground/ledger-forge/frontend/target/debug/deps/libslotmap-fbcd67747183e32a.rmeta: /home/profemzy/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/slotmap-1.0.7/src/lib.rs /home/profemzy/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/slotmap-1.0.7/src/basic.rs /home/profemzy/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/slotmap-1.0.7/src/dense.rs /home/profemzy/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/slotmap-1.0.7/src/hop.rs /home/profemzy/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/slotmap-1.0.7/src/secondary.rs /home/profemzy/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/slotmap-1.0.7/src/sparse_secondary.rs /home/profemzy/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/slotmap-1.0.7/src/util.rs
+
+/home/profemzy/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/slotmap-1.0.7/src/lib.rs:
+/home/profemzy/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/slotmap-1.0.7/src/basic.rs:
+/home/profemzy/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/slotmap-1.0.7/src/dense.rs:
+/home/profemzy/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/slotmap-1.0.7/src/hop.rs:
+/home/profemzy/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/slotmap-1.0.7/src/secondary.rs:
+/home/profemzy/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/slotmap-1.0.7/src/sparse_secondary.rs:
+/home/profemzy/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/slotmap-1.0.7/src/util.rs:
