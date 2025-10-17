@@ -1,6 +1,7 @@
 use leptos::*;
 
 #[derive(Clone, Copy, PartialEq)]
+#[allow(dead_code)]
 pub enum ToastKind { Info, Success, Error }
 
 #[derive(Clone)]
@@ -47,4 +48,3 @@ pub fn Toaster() -> impl IntoView {
         </div>
     }
 }
-

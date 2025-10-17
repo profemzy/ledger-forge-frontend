@@ -107,7 +107,11 @@ async fn parse_response<T: DeserializeOwned>(resp: gloo_net::http::Response) -> 
     let text = resp.text().await.map_err(|e| e.to_string())?;
     // Try parse as ApiResponse<T> first
     if let Ok(wrapper) = serde_json::from_str::<ApiResponse<T>>(&text) {
-        return Ok(wrapper.data);
+        return if wrapper.success {
+            Ok(wrapper.data)
+        } else {
+            Err(wrapper.message.unwrap_or_else(|| "Request failed".into()))
+        };
     }
     // Fallback: parse T directly
     serde_json::from_str::<T>(&text).map_err(|e| e.to_string())

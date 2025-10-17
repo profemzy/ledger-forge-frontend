@@ -10,16 +10,16 @@
 ## 📊 Overall Progress
 
 **Current Phase:** Core Features & UX Polish  
-**Completion:** ~70% (Core flows usable end‑to‑end)
+**Completion:** ~85% (Core flows + reporting UI + enriched dashboard)
 
 ```
-[███████████████████████████████░░░░░░] ~70%
+[█████████████████████████████████░░░░] ~85%
 
 ✅ Phase 1: Setup & Foundation (100%)
 ✅ Phase 2: Core Components (100%)
 ✅ Phase 3: Authentication & Protected Routes (100%)
-✅ Phase 4: Core Modules (Accounts, Transactions, Invoices, Payments) (80%+)
-⏳ Phase 5: Dashboard & Reporting (0%)
+✅ Phase 4: Core Modules (Accounts, Transactions, Invoices, Payments, Reporting) (90%+)
+⏳ Phase 5: Dashboard & Advanced Reporting (40%)
 ⏳ Phase 6: Final Polish & Testing (0%)
 ```
 
@@ -61,32 +61,34 @@
 
 ## 🚧 In Progress
 
-### Current Sprint: Core UX & Financial Flows
-**Goal:** Complete core AR flows and refine UX
+### Current Sprint: Dashboard & Reporting Polish
+**Goal:** Surface richer insights and provide export options
 
-- [ ] Global toasts adoption across all actions (partially adopted)
-- [ ] Invoice detail: Payments tab and status transitions
-- [ ] Payment detail: show existing applications (requires server endpoint)
-- [ ] Improve numeric inputs (masks/formatting)
+- [ ] Upgrade dashboard charts (net income trend, cash trend)
+- [ ] Add CSV export to reporting pages
+- [ ] Adopt currency/number formatting across remaining views
+- [ ] Extend toaster usage to every create/update/delete flow
 
 ---
 
 ## 📋 Upcoming Tasks
 
 ### Dashboard & Reporting
-- [ ] Dashboard stats (AR, unapplied, overdue, cash)
-- [ ] Reporting pages (Trial Balance, P&L, Balance Sheet, AR Aging)
+- [ ] Chart components (line/bar) with tooltips
+- [ ] Reporting exports (CSV / PDF)
+- [ ] Drill-down links (e.g., overdue invoices view, recent payments)
+- [ ] KPI variance vs prior period
 
-### Accounts Receivable Enhancements
-- [ ] Invoice detail: list applied payments (uses /invoices/{id}/payments)
-- [ ] Overdue invoices view with quick actions
+- [ ] Invoice detail: surface payment applications (pending API endpoint)
+- [ ] Overdue invoices quick actions (reminders, mark sent)
 
 ### Accounts Payable (Future)
 - [ ] Bills & bill payments UI
 
 ### Polish
-- [ ] Client‑side numeric formatting for money and quantities
-- [ ] Extract common UI components (Button, Input, Table, Modal)
+- [ ] Client-side numeric formatting / masking for money & quantities
+- [ ] Extract reusable UI primitives (Button, Input, Table, Modal)
+- [ ] Light/dark theme tokens & spacing scale review
 
 ---
 
@@ -102,11 +104,11 @@
 - [x] Project setup (100%)
 - [x] Authentication (100%)
 - [x] Accounts (100%)
-- [x] Transactions (90%)
-- [x] Invoices (80%)
-- [x] Payments (AR) (80%)
-- [ ] Dashboard (0%)
-- [ ] Reports (0%)
+- [x] Transactions (95%)
+- [x] Invoices (90%)
+- [x] Payments (AR) (90%)
+- [x] Reports (85%)
+- [ ] Dashboard (70%)
 
 ### Code Quality
 - [ ] All components tested
@@ -127,19 +129,22 @@
 ## 📝 Development Log
 
 ### October 16, 2025
-**Core Features & UX Progress**
+**Dashboard & Reporting Progress**
 - ✅ Middleware‑protected API consumed with JWT and refresh
 - ✅ Layout (Sidebar, Topbar, Footer, Breadcrumbs) with active highlighting
 - ✅ Accounts (list/create/detail/edit/activate + hierarchy + balance)
 - ✅ Transactions (list/create/detail/status transitions + totals)
-- ✅ Invoices (list/create/detail with per‑line + totals)
-- ✅ Payments (list/create/detail, apply to invoices)
+- ✅ Invoices (list/create/detail with per‑line + totals + payments tab + status actions)
+- ✅ Payments (list/create/detail, apply to invoices from detail)
+- ✅ Dashboard metrics (assets/liabilities/equity, AR outstanding, overdue totals, unapplied totals, recent activity tables)
+- ✅ Net income trend chart (last 6 months)
+- ✅ Reports: Trial Balance, Profit & Loss, Balance Sheet, A/R Aging pages
 - ✅ Global Toaster for notifications
 
 **Next Steps:**
-- Invoice detail: add payments tab and status transitions
-- Payment detail: show existing applications (server support TBD)
-- Dashboard and reporting pages (consume backend reporting endpoints)
+- Reporting exports (CSV/PDF) and richer charting
+- Dashboard drill-downs (links to filtered views) & additional KPI tiles
+- Payment application summary UI (pending API support)
 
 ---
 
@@ -150,12 +155,27 @@
 1. Compilable Project — ✅ Complete
 2. Authentication Working — ✅ Complete
 3. Core Modules (AR): Accounts, Transactions, Invoices, Payments — ✅ Mostly Complete
-4. Dashboard MVP — ⏳ Not Started
-5. Reporting Pages — ⏳ Not Started
+4. Dashboard MVP — ⏳ In Progress (40%)
+5. Reporting Pages — ✅ Complete
 6. Final Polish & Testing — ⏳ Not Started
 
-### Milestone 4: Production Ready ⏳
+### Milestone 4: Dashboard MVP ⏳
+**Target:** October 18, 2025  
+**Status:** In Progress
+- [x] Metrics (AR, assets/liabilities/equity, cash on hand)
+- [x] Recent activity widgets
+- [ ] Rich charts (cash & net income trends with tooltips)
+- [ ] Drill-down links to detailed views
+
+### Milestone 5: Reporting Exports ⏳
 **Target:** October 20, 2025  
+**Status:** Not Started
+- [ ] CSV export for each report
+- [ ] Chart polish
+- [ ] Documentation for financial report usage
+
+### Milestone 6: Production Ready ⏳
+**Target:** October 22, 2025  
 **Status:** Not Started
 - [ ] All features complete
 - [ ] Tests passing
@@ -201,18 +221,21 @@ This document is updated:
 - **Weekly** during maintenance
 - **After each milestone** completion
 
-**Last Review:** October 7, 2025  
-**Next Review:** October 8, 2025
+**Last Review:** October 16, 2025  
+**Next Review:** October 18, 2025
 
 ---
 
 ## 📊 Sprint Planning
 
-### Current Sprint: Foundation (Oct 7-8)
-**Goal:** Make project compile and run
+### Current Sprint: Dashboard & Reporting Polish (Oct 15-18)
+**Goal:** Surface richer insights and prepare exports**
 
 **Tasks:**
-1. Create all stub files
+1. Implement dashboard charts (net income & cash trends)
+2. Add CSV export buttons to reporting pages
+3. Apply currency/number formatting consistently
+4. Extend toast notifications to remaining flows
 2. Implement basic types
 3. Test compilation
 4. Run development server

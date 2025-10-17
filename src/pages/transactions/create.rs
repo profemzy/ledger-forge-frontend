@@ -2,6 +2,7 @@ use chrono::NaiveDate;
 use leptos::*;
 use leptos_router::use_navigate;
 use rust_decimal::Decimal;
+use crate::utils::format::format_money;
 use uuid::Uuid;
 
 use crate::api::{transactions as tx_api, accounts as accounts_api, contacts as contacts_api};
@@ -243,8 +244,8 @@ pub fn TransactionCreate() -> impl IntoView {
                 </div>
 
                 <div class="mt-4 flex gap-6 items-center">
-                    <div>"Total Debits: "<span class="font-mono">{move || total_debits().to_string()}</span></div>
-                    <div>"Total Credits: "<span class="font-mono">{move || total_credits().to_string()}</span></div>
+                    <div>"Total Debits: "<span class="font-mono">{move || format_money(&total_debits())}</span></div>
+                    <div>"Total Credits: "<span class="font-mono">{move || format_money(&total_credits())}</span></div>
                     <div class={move || if total_debits() == total_credits() && total_debits() > Decimal::ZERO { "text-green-700" } else { "text-red-700" }}>
                         {move || if total_debits() == total_credits() && total_debits() > Decimal::ZERO { "Balanced" } else { "Unbalanced" }}
                     </div>

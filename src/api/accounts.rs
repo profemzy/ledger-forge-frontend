@@ -7,6 +7,7 @@ use crate::types::accounts::{
 
 #[derive(Debug, serde::Deserialize)]
 struct BalanceResponse {
+    #[allow(dead_code)]
     account_id: uuid::Uuid,
     balance: AccountBalance,
 }

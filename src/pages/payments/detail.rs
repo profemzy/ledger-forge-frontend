@@ -7,6 +7,7 @@ use crate::api::{payments as pay_api, invoices as inv_api};
 use crate::types::payments::Payment;
 use crate::types::invoices::{Invoice, InvoiceStatus};
 use crate::state::{ToastContext, ToastKind};
+use crate::utils::format::format_money;
 
 #[component]
 pub fn PaymentDetail() -> impl IntoView {
@@ -109,8 +110,8 @@ pub fn PaymentDetail() -> impl IntoView {
                                         </tbody>
                                     </table>
                                     <div class="mt-4 flex gap-6 items-center">
-                                        <div>"Unapplied Available: "<span class="font-mono">{p.unapplied_amount.unwrap_or_default().to_string()}</span></div>
-                                        <div>"Apply Now: "<span class="font-mono">{move || total_applied().to_string()}</span></div>
+                                        <div>"Unapplied Available: "<span class="font-mono">{format_money(&p.unapplied_amount.unwrap_or_default())}</span></div>
+                                        <div>"Apply Now: "<span class="font-mono">{move || format_money(&total_applied())}</span></div>
                                     </div>
                                     <div class="mt-4">
                                         <button class="bg-blue-600 text-white px-4 py-2 rounded" on:click=move |_| apply_action.dispatch(())>"Apply Payment"</button>
@@ -136,8 +137,8 @@ fn PaymentView(p: Payment) -> impl IntoView {
                     <div class="text-xl font-semibold">{"Payment "}{p.payment_number.clone().unwrap_or_else(|| p.id.to_string())}</div>
                     <div class="text-gray-600">{"Date: "}{p.payment_date.to_string()} {" • Method: "}{p.payment_method.clone()} {" • Ref: "}{p.reference_number.clone().unwrap_or_else(|| "—".into())}</div>
                     <div class="mt-1">
-                        <span class="text-xs px-2 py-1 rounded bg-blue-100 text-blue-700 border">{"Amount: "}{p.amount.to_string()}</span>
-                        <span class="ml-2 text-xs px-2 py-1 rounded bg-yellow-100 text-yellow-700 border">{"Unapplied: "}{p.unapplied_amount.unwrap_or_default().to_string()}</span>
+                        <span class="text-xs px-2 py-1 rounded bg-blue-100 text-blue-700 border">{"Amount: "}{format_money(&p.amount)}</span>
+                        <span class="ml-2 text-xs px-2 py-1 rounded bg-yellow-100 text-yellow-700 border">{"Unapplied: "}{format_money(&p.unapplied_amount.unwrap_or_default())}</span>
                     </div>
                 </div>
             </div>

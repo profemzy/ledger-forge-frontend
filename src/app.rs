@@ -8,6 +8,7 @@ use crate::components::layout::Layout;
 use crate::pages::transactions::{TransactionsList, TransactionCreate, TransactionDetail};
 use crate::pages::invoices::{InvoicesList, InvoiceCreate, InvoiceDetail};
 use crate::pages::payments::{PaymentsList, PaymentCreate};
+use crate::pages::reporting::{ReportsIndex, TrialBalancePage, ProfitLossPage, BalanceSheetPage, ARAgingPage};
 use crate::pages::accounts::{AccountsList, AccountCreate, AccountDetail};
 use crate::state::AuthContext;
 
@@ -43,6 +44,11 @@ pub fn App() -> impl IntoView {
                         <Route path="/payments" view=PaymentsList/>
                         <Route path="/payments/new" view=PaymentCreate/>
                         <Route path="/payments/:id" view=crate::pages::payments::detail::PaymentDetail/>
+                        <Route path="/reports" view=ReportsIndex/>
+                        <Route path="/reports/trial-balance" view=TrialBalancePage/>
+                        <Route path="/reports/profit-loss" view=ProfitLossPage/>
+                        <Route path="/reports/balance-sheet" view=BalanceSheetPage/>
+                        <Route path="/reports/ar-aging" view=ARAgingPage/>
                     </Route>
                 </Route>
                 <Route path="/*" view=NotFound/>

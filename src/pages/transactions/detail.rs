@@ -5,6 +5,7 @@ use uuid::Uuid;
 use crate::api::transactions as api;
 use crate::types::transactions::{TransactionWithLineItems, TransactionStatus};
 use crate::state::{ToastContext, ToastKind};
+use crate::utils::format::format_money;
 use crate::types::accounts::Account;
 use crate::api::accounts as accounts_api;
 
@@ -147,8 +148,8 @@ fn TxView(tx: TransactionWithLineItems, accounts: Option<Vec<Account>>, post: Ac
                                 <tr class="border-b">
                                     <td class="py-2 px-3"><A class="text-akowe-blue-600 hover:underline" href=format!("/accounts/{}", li.account_id)>{label}</A></td>
                                     <td class="py-2 px-3">{li.description.clone().unwrap_or_else(|| "—".into())}</td>
-                                    <td class="py-2 px-3">{li.debit_amount.to_string()}</td>
-                                    <td class="py-2 px-3">{li.credit_amount.to_string()}</td>
+                                <td class="py-2 px-3">{format_money(&li.debit_amount)}</td>
+                                <td class="py-2 px-3">{format_money(&li.credit_amount)}</td>
                                 </tr>
                             }
                         }).collect_view()}
@@ -159,8 +160,8 @@ fn TxView(tx: TransactionWithLineItems, accounts: Option<Vec<Account>>, post: Ac
                     let total_credits = tx.line_items.iter().fold(rust_decimal::Decimal::ZERO, |acc, li| acc + li.credit_amount);
                     view!{
                         <div class="flex justify-end gap-6 p-4">
-                            <div>"Total Debits: "<span class="font-mono">{total_debits.to_string()}</span></div>
-                            <div>"Total Credits: "<span class="font-mono">{total_credits.to_string()}</span></div>
+                            <div>"Total Debits: "<span class="font-mono">{format_money(&total_debits)}</span></div>
+                            <div>"Total Credits: "<span class="font-mono">{format_money(&total_credits)}</span></div>
                         </div>
                     }
                 }

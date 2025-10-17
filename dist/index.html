@@ -25,8 +25,8 @@
     <!-- Instruct Trunk to compile the Rust crate and inject JS/WASM. Disable SRI in dev to avoid hash mismatches. -->
     
 <script type="module">
-import init, * as bindings from '/akowe-cf974e47dbec85bd.js';
-const wasm = await init({ module_or_path: '/akowe-cf974e47dbec85bd_bg.wasm' });
+import init, * as bindings from '/akowe-53948d057577b67d.js';
+const wasm = await init({ module_or_path: '/akowe-53948d057577b67d_bg.wasm' });
 
 
 window.wasmBindings = bindings;
@@ -38,7 +38,7 @@ dispatchEvent(new CustomEvent("TrunkApplicationStarted", {detail: {wasm}}));
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
-<link rel="modulepreload" href="/akowe-cf974e47dbec85bd.js" crossorigin="anonymous" integrity="sha384-9oMwD09HMgSqpiUhbkvTnSDZ7FYbSkYqT60ZwZynrjRV1csQkmMXxtVmw/KE+QXO"><link rel="preload" href="/akowe-cf974e47dbec85bd_bg.wasm" crossorigin="anonymous" integrity="sha384-qY81cmfHxrOHZsOtKU50Lw8HWG2YQd7TEEEna7sO3xsmLy0xROov+cSKtxlb4FbG" as="fetch" type="application/wasm"></head>
+<link rel="modulepreload" href="/akowe-53948d057577b67d.js" crossorigin="anonymous" integrity="sha384-D3Vx0Y0sBQH13j2vTvq1kEgyutDjZX1UIqJ/CB1ClgyFBrCSpBCapFYuKK4yljG+"><link rel="preload" href="/akowe-53948d057577b67d_bg.wasm" crossorigin="anonymous" integrity="sha384-mlkTWA2tAXKTMhglJ5KzzCWXtsVmAsJh2+G/l8JsAWqE4ItkMFswWGdN80Hx0I2K" as="fetch" type="application/wasm"></head>
 <body class="font-sans bg-gray-50 text-gray-900">
     <noscript>You need to enable JavaScript to run this app.</noscript>
 <script>"use strict";

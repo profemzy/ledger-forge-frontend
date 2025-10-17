@@ -8,6 +8,7 @@ pub mod accounts;
 pub mod transactions;
 pub mod invoices;
 pub mod payments;
+pub mod reporting;
 
 pub use login::Login;
 pub use dashboard::Dashboard;

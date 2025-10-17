@@ -24,6 +24,7 @@ pub struct Payment {
 }
 
 #[derive(Clone, Debug, Serialize, Deserialize, PartialEq)]
+#[allow(dead_code)]
 pub struct PaymentApplication {
     pub id: Uuid,
     pub payment_id: Uuid,
@@ -51,4 +52,3 @@ pub struct CreatePaymentRequest {
     pub company_id: Option<Uuid>,
     pub applications: Vec<PaymentApplicationRequest>,
 }
-

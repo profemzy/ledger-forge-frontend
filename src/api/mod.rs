@@ -8,11 +8,4 @@ pub mod transactions;
 pub mod contacts;
 pub mod invoices;
 pub mod payments;
-
-pub use client::*;
-pub use auth::*;
-pub use accounts::*;
-pub use transactions::*;
-pub use contacts::*;
-pub use invoices::*;
-pub use payments::*;
+pub mod reporting;

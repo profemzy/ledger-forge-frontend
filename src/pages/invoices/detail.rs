@@ -3,9 +3,10 @@ use leptos_router::{use_params_map, A};
 use uuid::Uuid;
 
 use crate::api::invoices as api;
-use crate::types::invoices::{InvoiceWithLineItems, InvoiceStatus, Invoice};
+use crate::types::invoices::{InvoiceWithLineItems, InvoiceStatus};
 use crate::types::payments::Payment;
 use crate::state::{ToastContext, ToastKind};
+use crate::utils::format::format_money;
 
 #[component]
 pub fn InvoiceDetail() -> impl IntoView {
@@ -90,8 +91,8 @@ fn InvoiceView(inv: InvoiceWithLineItems, mark_sent: Action<(), ()>, mark_paid: 
                         <div class="text-gray-600">{"Date: "}{inv.invoice.invoice_date.to_string()} {" • Due: "}{inv.invoice.due_date.to_string()}</div>
                         <div class="mt-1">
                             <span class="text-xs px-2 py-1 rounded bg-gray-100 text-gray-700 border">{"Status: "}{format!("{:?}", inv.invoice.status).to_lowercase()}</span>
-                            <span class="ml-2 text-xs px-2 py-1 rounded bg-blue-100 text-blue-700 border">{"Total: "}{inv.invoice.total_amount.to_string()}</span>
-                            <span class="ml-2 text-xs px-2 py-1 rounded bg-yellow-100 text-yellow-700 border">{"Balance: "}{inv.invoice.balance.to_string()}</span>
+                            <span class="ml-2 text-xs px-2 py-1 rounded bg-blue-100 text-blue-700 border">{"Total: "}{format_money(&inv.invoice.total_amount)}</span>
+                            <span class="ml-2 text-xs px-2 py-1 rounded bg-yellow-100 text-yellow-700 border">{"Balance: "}{format_money(&inv.invoice.balance)}</span>
                         </div>
                     </div>
                     <div class="space-x-2">
@@ -120,8 +121,8 @@ fn InvoiceView(inv: InvoiceWithLineItems, mark_sent: Action<(), ()>, mark_paid: 
                                 <td class="py-2 px-3">{li.line_number}</td>
                                 <td class="py-2 px-3">{li.item_description.clone()}</td>
                                 <td class="py-2 px-3">{li.quantity.to_string()}</td>
-                                <td class="py-2 px-3">{li.unit_price.to_string()}</td>
-                                <td class="py-2 px-3">{li.amount.to_string()}</td>
+                                <td class="py-2 px-3">{format_money(&li.unit_price)}</td>
+                                <td class="py-2 px-3">{format_money(&li.amount)}</td>
                             </tr>
                         }).collect_view()}
                     </tbody>
@@ -148,8 +149,8 @@ fn PaymentsTable(items: Vec<Payment>) -> impl IntoView {
                     <tr class="border-b">
                         <td class="py-2 px-3">{p.payment_date.to_string()}</td>
                         <td class="py-2 px-3 font-mono text-sm"><A class="text-akowe-blue-600 hover:underline" href=format!("/payments/{}", p.id)>{p.payment_number.unwrap_or_else(|| "—".into())}</A></td>
-                        <td class="py-2 px-3">{p.amount.to_string()}</td>
-                        <td class="py-2 px-3">{p.unapplied_amount.unwrap_or_default().to_string()}</td>
+                        <td class="py-2 px-3">{format_money(&p.amount)}</td>
+                        <td class="py-2 px-3">{format_money(&p.unapplied_amount.unwrap_or_default())}</td>
                     </tr>
                 }).collect_view()}
             </tbody>

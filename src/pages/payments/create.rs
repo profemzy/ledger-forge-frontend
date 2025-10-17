@@ -10,6 +10,7 @@ use crate::types::contacts::Contact;
 use crate::types::invoices::Invoice;
 use crate::types::accounts::{Account, AccountType};
 use crate::state::{ToastContext, ToastKind};
+use crate::utils::format::format_money;
 
 #[component]
 pub fn PaymentCreate() -> impl IntoView {
@@ -237,8 +238,8 @@ pub fn PaymentCreate() -> impl IntoView {
                 </div>
 
                 <div class="mt-4 flex gap-6 items-center">
-                    <div>"Total Applied: "<span class="font-mono">{move || total_applied().to_string()}</span></div>
-                    <div>"Unapplied: "<span class="font-mono">{move || unapplied().to_string()}</span></div>
+                    <div>"Total Applied: "<span class="font-mono">{move || format_money(&total_applied())}</span></div>
+                    <div>"Unapplied: "<span class="font-mono">{move || format_money(&unapplied())}</span></div>
                 </div>
 
                 <div class="mt-6">
@@ -248,4 +249,3 @@ pub fn PaymentCreate() -> impl IntoView {
         </div>
     }
 }
-
