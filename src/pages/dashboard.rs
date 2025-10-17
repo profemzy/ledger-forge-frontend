@@ -9,7 +9,7 @@ use crate::api::{invoices as inv_api, payments as pay_api, transactions as tx_ap
 use crate::utils::format::format_money;
 use crate::types::transactions::Transaction;
 use crate::types::payments::Payment;
-use crate::components::ui::{ChartBars, ChartPoint};
+use crate::components::ui::{ChartBars, ChartLine, ChartPoint};
 
 #[derive(Clone, Debug, serde::Deserialize, serde::Serialize)]
 struct NetIncomePoint {
@@ -335,7 +335,7 @@ fn NetIncomeChart(res: Resource<(), Result<Vec<NetIncomePoint>, String>>) -> imp
                             view!{ <div class="text-gray-600">"No data."</div> }.into_view()
                         } else {
                             let entries: Vec<ChartPoint> = points.clone().into_iter().map(|p| ChartPoint { label: p.label, amount: p.amount }).collect();
-                            view!{ <ChartBars entries=entries positive_color="bg-green-500" negative_color="bg-red-500"/> }.into_view()
+                            view!{ <ChartLine entries=entries color="#16a34a"/> }.into_view()
                         }
                     }
                     Some(Err(e)) => view!{ <div class="text-red-600">{e}</div> }.into_view(),

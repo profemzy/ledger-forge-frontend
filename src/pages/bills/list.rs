@@ -28,7 +28,10 @@ pub fn BillsList() -> impl IntoView {
         <div class="p-6">
             <div class="flex items-center justify-between mb-4">
                 <h1 class="text-2xl font-semibold">"Bills"</h1>
-                <ButtonLink href="/bills/new" variant="primary">{"New Bill"}</ButtonLink>
+                <div class="flex items-center gap-2">
+                    <ButtonLink href="/bill-payments/new" variant="secondary">{"Record Bill Payment"}</ButtonLink>
+                    <ButtonLink href="/bills/new" variant="primary">{"New Bill"}</ButtonLink>
+                </div>
             </div>
 
             <div class="flex gap-4 mb-4 items-center">

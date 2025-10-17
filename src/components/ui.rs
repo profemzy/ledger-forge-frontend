@@ -110,7 +110,7 @@ pub fn MoneyInput(
 
 #[component]
 pub fn Table(children: Children) -> impl IntoView {
-    view! { <div class="bg-white dark:bg-gray-900 rounded shadow overflow-hidden"><table class="w-full border-collapse">{children()}</table></div> }
+    view! { <div class="bg-white dark:bg-gray-900 rounded shadow overflow-auto"><table class="w-full border-collapse table-sticky zebra">{children()}</table></div> }
 }
 
 #[derive(Clone, Debug)]
@@ -144,6 +144,38 @@ pub fn ChartBars(
                     }
                 }).collect_view()}
             </div>
+        </div>
+    }
+}
+
+#[component]
+pub fn ChartLine(entries: Vec<ChartPoint>, #[prop(optional)] color: Option<&'static str>) -> impl IntoView {
+    let stroke = color.unwrap_or("#2563eb");
+    let (mut min_y, mut max_y) = (Decimal::ZERO, Decimal::ZERO);
+    for p in &entries { if p.amount < min_y { min_y = p.amount; } if p.amount > max_y { max_y = p.amount; } }
+    let range = if max_y == min_y { Decimal::new(1, 0) } else { max_y - min_y };
+    let w_per = 40.0;
+    let height = 140.0;
+    let mut d = String::new();
+    for (i, p) in entries.iter().enumerate() {
+        let x = (i as f64) * w_per + 20.0;
+        let y_norm = ((p.amount - min_y) / range).to_f64().unwrap_or(0.0);
+        let y = height - (y_norm * (height - 20.0)) - 10.0;
+        if i == 0 { d.push_str(&format!("M {:.1} {:.1}", x, y)); } else { d.push_str(&format!(" L {:.1} {:.1}", x, y)); }
+    }
+    let width = (entries.len() as f64) * w_per + 40.0;
+    view! {
+        <div class="overflow-x-auto">
+            <svg width={format!("{:.0}", width)} height="160" class="min-w-max">
+                <path d=d stroke=stroke fill="none" stroke-width="2" />
+                {entries.iter().enumerate().map(|(i, p)| {
+                    let x = (i as f64) * w_per + 20.0;
+                    let y_norm = ((p.amount - min_y) / range).to_f64().unwrap_or(0.0);
+                    let y = height - (y_norm * (height - 20.0)) - 10.0;
+                    let tip = format!("{}: {}", p.label, crate::utils::format::format_money(&p.amount));
+                    view!{ <circle cx={format!("{:.1}", x)} cy={format!("{:.1}", y)} r="3" fill=stroke><title>{tip}</title></circle> }
+                }).collect_view()}
+            </svg>
         </div>
     }
 }

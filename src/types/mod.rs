@@ -10,3 +10,4 @@ pub mod invoices;
 pub mod payments;
 pub mod reporting;
 pub mod bills;
+pub mod bill_payments;

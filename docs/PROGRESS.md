@@ -3,17 +3,17 @@
 **Project:** Akowe (The Documenter)  
 **Framework:** Leptos (Rust + WebAssembly)  
 **Started:** October 7, 2025  
-**Last Updated:** October 16, 2025
+**Last Updated:** October 17, 2025
 
 ---
 
 ## 📊 Overall Progress
 
 **Current Phase:** Core Features & UX Polish  
-**Completion:** ~85% (Core flows + reporting UI + enriched dashboard)
+**Completion:** ~92% (Core flows + AP UI + enriched dashboard)
 
 ```
-[█████████████████████████████████░░░░] ~85%
+[████████████████████████████████████░] ~92%
 
 ✅ Phase 1: Setup & Foundation (100%)
 ✅ Phase 2: Core Components (100%)
@@ -64,7 +64,7 @@
 ### Current Sprint: Dashboard & Reporting Polish
 **Goal:** Surface richer insights and provide export options
 
-- [ ] Upgrade dashboard charts (net income trend, cash trend)
+- [x] Upgrade dashboard charts (net income line + cash bars, tooltips)
 - [x] Add CSV export to reporting pages
 - [x] Adopt currency/number formatting across remaining views
 - [x] Extend toaster usage to every create/update/delete flow
@@ -74,7 +74,7 @@
 ## 📋 Upcoming Tasks
 
 ### Dashboard & Reporting
-- [x] Chart components (bar) with tooltips; line pending
+- [x] Chart components (bar + line) with tooltips
 - [x] Reporting exports (CSV / PDF)
 - [x] Drill-down links (overdue invoices, unapplied payments, AR aging)
 - [x] KPI variance vs prior period (delta vs last month)
@@ -84,11 +84,13 @@
 
 ### Accounts Payable (AP)
 - [x] Bills UI (list/create/detail)
-- [ ] Bill payments UI
+- [x] Bill payments UI (create)
+- [ ] Bill payments list/history
 
 ### Polish
 - [x] Client-side numeric formatting / masking for money & quantities
 - [x] Extract reusable UI primitives (Button, Input, Table, Modal)
+- [x] Sticky table headers + zebra stripes
 - [x] Light/dark theme toggle with class strategy
 
 ---
@@ -108,8 +110,8 @@
 - [x] Transactions (95%)
 - [x] Invoices (90%)
 - [x] Payments (AR) (90%)
-- [x] Reports (85%)
-- [ ] Dashboard (70%)
+- [x] Reports (90%)
+- [ ] Dashboard (85%)
 
 ### Code Quality
 - [ ] All components tested
@@ -122,8 +124,7 @@
 ## 🐛 Known Issues
 
 - Tailwind via CDN is used for speed; consider adding a compile step if needed.
-- Numeric inputs are free‑form; add masking/formatting for better UX.
-- Some pages show IDs where names could be resolved (minor polish).
+- Some pages still show IDs where names could be resolved (minor polish).
 
 ---
 
@@ -170,7 +171,7 @@ UI/UX polish
 1. Compilable Project — ✅ Complete
 2. Authentication Working — ✅ Complete
 3. Core Modules (AR): Accounts, Transactions, Invoices, Payments — ✅ Mostly Complete
-4. Dashboard MVP — ⏳ In Progress (40%)
+4. Dashboard MVP — ⏳ In Progress (85%)
 5. Reporting Pages — ✅ Complete
 6. Final Polish & Testing — ⏳ Not Started
 
@@ -179,7 +180,7 @@ UI/UX polish
 **Status:** In Progress
 - [x] Metrics (AR, assets/liabilities/equity, cash on hand)
 - [x] Recent activity widgets
-- [ ] Rich charts (cash & net income trends with tooltips)
+- [x] Rich charts (cash & net income trends with tooltips)
 - [x] Drill-down links to detailed views
 
 ### Milestone 5: Reporting Exports ⏳
@@ -237,8 +238,8 @@ This document is updated:
 - **Weekly** during maintenance
 - **After each milestone** completion
 
-**Last Review:** October 16, 2025  
-**Next Review:** October 18, 2025
+**Last Review:** October 17, 2025  
+**Next Review:** October 20, 2025
 
 ---
 
@@ -247,14 +248,16 @@ This document is updated:
 ### Current Sprint: Dashboard & Reporting Polish (Oct 15-18)
 **Goal:** Surface richer insights and prepare exports**
 
-**Tasks:**
-1. Implement dashboard charts (net income & cash trends)
-2. Add CSV export buttons to reporting pages
-3. Apply currency/number formatting consistently
-4. Extend toast notifications to remaining flows
-2. Implement basic types
-3. Test compilation
-4. Run development server
+**Done:**
+1. Rich charts (net income line, cash bars) + tooltips
+2. CSV export + Print to PDF on all reports
+3. Currency/number formatting and masking
+4. Toast notifications across mutations
+
+**Next:**
+1. Chart polish (axis/grid/area fill)
+2. Bill payments list/history
+3. Report usage documentation
 
 **Success Criteria:**
 - `trunk serve` runs without errors

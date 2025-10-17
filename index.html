@@ -44,6 +44,12 @@
     }
     .dark input::placeholder,
     .dark textarea::placeholder { color: #9ca3af !important; }
+    /* Sticky table headers + zebra stripes */
+    .table-sticky thead { position: sticky; top: 0; z-index: 1; }
+    .table-sticky thead tr { background-color: #f9fafb; }
+    .dark .table-sticky thead tr { background-color: #1f2937 !important; }
+    .zebra tbody tr:nth-child(even) { background-color: rgba(107,114,128,0.05); }
+    .dark .zebra tbody tr:nth-child(even) { background-color: rgba(255,255,255,0.04); }
   </style>
     <!-- Instruct Trunk to compile the Rust crate and inject JS/WASM. Disable SRI in dev to avoid hash mismatches. -->
     <link data-trunk rel="rust">

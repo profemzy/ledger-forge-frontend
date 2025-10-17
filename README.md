@@ -1,8 +1,8 @@
 # Akowe Frontend
 
-**The Documenter** - Professional accounting interface for LedgerForge
+**The Documenter** — Professional accounting interface for LedgerForge.
 
-Built with Leptos (Rust + WebAssembly) for blazing performance and type safety.
+Built with Leptos 0.6 (Rust + WebAssembly, CSR) for performance and type safety.
 
 ## 🚀 Quick Start
 
@@ -46,18 +46,34 @@ trunk build --release
 ```
 frontend/
 ├── src/
-│   ├── main.rs              # Entry point ✅
-│   ├── app.rs               # Main app with routing ✅
-│   ├── api/                 # API client (TODO)
-│   ├── components/          # Reusable components (TODO)
-│   │   ├── auth/           # Login, Register
-│   │   ├── dashboard/      # Stats, Charts, Activity
-│   │   ├── layout/         # Sidebar, Topbar
-│   │   └── ui/             # Button, Input, Card
-│   ├── pages/              # Page components (TODO)
-│   ├── state/              # State management ✅
-│   ├── types/              # Type definitions (TODO)
-│   └── utils/              # Helpers (TODO)
+│   ├── main.rs                  # Entry point
+│   ├── app.rs                   # App router (protected routes)
+│   ├── api/                     # API clients
+│   │   ├── client.rs            # HTTP client (JWT + refresh)
+│   │   ├── accounts.rs, transactions.rs, contacts.rs,
+│   │   │   invoices.rs, payments.rs, reporting.rs,
+│   │   │   bills.rs, bill_payments.rs
+│   ├── components/
+│   │   ├── layout.rs            # Sidebar, header, breadcrumbs, dark toggle
+│   │   ├── modal.rs             # Modal component
+│   │   └── ui.rs                # Button, ButtonLink, Card, Table, Charts
+│   ├── pages/                   # Pages by domain
+│   │   ├── dashboard.rs
+│   │   ├── accounts/{list,create,detail}.rs
+│   │   ├── transactions/{list,create,detail}.rs
+│   │   ├── invoices/{list,create,detail}.rs
+│   │   ├── payments/{list,create,detail}.rs
+│   │   ├── bills/{list,create,detail}.rs
+│   │   ├── bill_payments/{create}.rs
+│   │   └── reporting/{index,trial_balance,profit_loss,balance_sheet,ar_aging}.rs
+│   ├── state/                   # Auth + toast
+│   │   ├── auth.rs, notify.rs, mod.rs
+│   ├── types/                   # Shared types
+│   │   ├── accounts.rs, transactions.rs, invoices.rs,
+│   │   │   payments.rs, reporting.rs, contacts.rs, bills.rs,
+│   │   │   bill_payments.rs, user.rs, api.rs, mod.rs
+│   └── utils/                   # Helpers (formatting, storage)
+│       ├── format.rs, storage.rs, mod.rs
 ├── docs/                   # Documentation ✅
 │   ├── FRONTEND_ARCHITECTURE.md
 │   ├── FRONTEND_COMPARISON.md
@@ -70,63 +86,22 @@ frontend/
 └── tailwind.config.js      # Tailwind config ✅
 ```
 
-## ✅ Completed
+## ✅ Implemented Features
 
-- [x] Project structure
-- [x] Configuration files (Cargo.toml, Trunk.toml, Tailwind)
-- [x] Main entry point (main.rs)
-- [x] App component with routing (app.rs)
-- [x] Auth state management (state/auth.rs)
-- [x] Comprehensive documentation
-
-## 🚧 Next Steps
-
-### 1. Create Module Files
-```bash
-# Create all mod.rs files
-touch src/api/mod.rs
-touch src/components/mod.rs
-touch src/pages/mod.rs
-touch src/types/mod.rs
-touch src/utils/mod.rs
-```
-
-### 2. Implement Utils
-- [ ] src/utils/storage.rs - LocalStorage helpers
-- [ ] src/utils/mod.rs - Export utilities
-
-### 3. Implement API Client
-- [ ] src/api/client.rs - HTTP client
-- [ ] src/api/auth.rs - Auth API calls
-- [ ] src/api/mod.rs - Export API functions
-
-### 4. Implement Types
-- [ ] src/types/user.rs - User types
-- [ ] src/types/api.rs - API response types
-- [ ] src/types/mod.rs - Export types
-
-### 5. Implement UI Components
-- [ ] src/components/ui/button.rs
-- [ ] src/components/ui/input.rs
-- [ ] src/components/ui/card.rs
-- [ ] src/components/ui/mod.rs
-
-### 6. Implement Pages
-- [ ] src/pages/login.rs - Login page
-- [ ] src/pages/dashboard.rs - Dashboard page
-- [ ] src/pages/not_found.rs - 404 page
-- [ ] src/pages/mod.rs
-
-### 7. Implement Dashboard Components
-- [ ] src/components/dashboard/stat_card.rs
-- [ ] src/components/dashboard/activity.rs
-- [ ] src/components/dashboard/mod.rs
-
-### 8. Implement Layout
-- [ ] src/components/layout/sidebar.rs
-- [ ] src/components/layout/topbar.rs
-- [ ] src/components/layout/layout.rs
-- [ ] src/components/layout/mod.rs
+- Authentication: login, protected routes, JWT refresh
+- Layout: sidebar with active state, sticky header, breadcrumbs, dark mode toggle
+- UI Kit: Button, ButtonLink, Card, Modal, Table (sticky header + zebra)
+- Charts: bar and line components with tooltips (Net Income line, Cash bars)
+- Accounts: list, create, detail (hierarchy, balance, activate/deactivate)
+- Transactions: list, create (balanced lines), detail (status transitions)
+- Invoices (AR): list, create (per-line calc), detail (payments, status)
+- Payments (AR): list, create, detail, apply to invoices, unapplied filter
+- Bills (AP): list, create, detail
+- Bill Payments (AP): create (apply to open vendor bills)
+- Reports: Trial Balance, Profit & Loss, Balance Sheet, A/R Aging
+  - CSV export + Print to PDF on all reports
+- Formatting: currency formatting + masked numeric inputs
+- Dark Mode: class strategy with global overrides (via Tailwind CDN)
 
 ## 📚 Documentation
 
@@ -148,16 +123,30 @@ See [`docs/`](./docs/) for complete documentation:
 - Sans: Inter
 - Mono: JetBrains Mono
 
-### Components
-- Buttons: `.btn-primary`, `.btn-secondary`
-- Cards: `.card`
-- Inputs: `.input-field`
+### Components (high-level)
+- Buttons/Links: primary, secondary, ghost variants
+- Cards: neutral backgrounds (light/dark)
+- Table: sticky header, zebra rows, scroll container
+- Modal: centered overlay with action slot
+- Charts: bar and line (SVG), tooltips
 
 ## 🔗 Backend Integration
 
 Connects to LedgerForge backend at:
 - Development: `http://localhost:3000/api/v1`
-- Production: Configure in environment
+- Production: configure in `src/api/client.rs` (`api_base()`), or adapt to read from meta/env
+
+Auth: JWT access tokens with automatic refresh on 401, stored in localStorage.
+
+Routes (selected):
+- `/dashboard`
+- `/accounts`, `/accounts/new`, `/accounts/:id`
+- `/transactions`, `/transactions/new`, `/transactions/:id`
+- `/invoices`, `/invoices/new`, `/invoices/:id`
+- `/payments`, `/payments/new`, `/payments/:id`
+- `/bills`, `/bills/new`, `/bills/:id`
+- `/bill-payments/new`
+- `/reports`, `/reports/trial-balance`, `/reports/profit-loss`, `/reports/balance-sheet`, `/reports/ar-aging`
 
 ## 📝 License
 
