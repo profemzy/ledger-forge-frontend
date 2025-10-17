@@ -28,7 +28,12 @@ pub fn TrialBalancePage() -> impl IntoView {
 
             <Transition fallback=move || view!{ <div>"Loading..."</div> }>
                 {move || match report.get() {
-                    Some(Ok(tb)) => view!{ <TrialBalanceTable tb=tb/> }.into_view(),
+                    Some(Ok(tb)) => view!{
+                        <div class="flex items-center justify-end mb-2">
+                            <TrialBalanceExportButton tb=tb.clone()/>
+                        </div>
+                        <TrialBalanceTable tb=tb/>
+                    }.into_view(),
                     Some(Err(e)) => view!{ <div class="text-red-600">{e}</div> }.into_view(),
                     None => view!{ <div/> }.into_view(),
                 }}
@@ -73,4 +78,43 @@ fn TrialBalanceTable(tb: TrialBalance) -> impl IntoView {
             <div class={if tb.is_balanced {"p-3 text-green-700"} else {"p-3 text-red-700"}}>{if tb.is_balanced {"Balanced"} else {"Unbalanced"}}</div>
         </div>
     }
+}
+
+#[component]
+fn TrialBalanceExportButton(tb: TrialBalance) -> impl IntoView {
+    // Build CSV string (no thousands separators)
+    let csv = {
+        let mut lines: Vec<String> = Vec::new();
+        lines.push("Account Code,Account Name,Account Type,Debit,Credit".to_string());
+        for e in &tb.entries {
+            let name = escape_csv(&e.account_name);
+            lines.push(format!("{},{},{},{},{}",
+                e.account_code,
+                name,
+                e.account_type,
+                crate::utils::format::format_money_csv(&e.debit),
+                crate::utils::format::format_money_csv(&e.credit)
+            ));
+        }
+        lines.push(format!("Totals,,,{},{}",
+            crate::utils::format::format_money_csv(&tb.total_debits),
+            crate::utils::format::format_money_csv(&tb.total_credits)
+        ));
+        lines.join("\n")
+    };
+
+    let href = {
+        let encoded = js_sys::encode_uri_component(&csv).as_string().unwrap_or_default();
+        format!("data:text/csv;charset=utf-8,{}", encoded)
+    };
+    let filename = format!("trial_balance_{}.csv", tb.as_of_date.to_string());
+
+    view! { <a class="text-sm underline text-akowe-blue-600" href={href} download={filename}>"Export CSV"</a> }
+}
+
+fn escape_csv(s: &str) -> String {
+    let mut out = s.replace('"', "\"\"");
+    out.insert(0, '"');
+    out.push('"');
+    out
 }

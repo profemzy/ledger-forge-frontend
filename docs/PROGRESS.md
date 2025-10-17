@@ -65,9 +65,9 @@
 **Goal:** Surface richer insights and provide export options
 
 - [ ] Upgrade dashboard charts (net income trend, cash trend)
-- [ ] Add CSV export to reporting pages
-- [ ] Adopt currency/number formatting across remaining views
-- [ ] Extend toaster usage to every create/update/delete flow
+- [x] Add CSV export to reporting pages
+- [x] Adopt currency/number formatting across remaining views
+- [x] Extend toaster usage to every create/update/delete flow
 
 ---
 
@@ -76,10 +76,10 @@
 ### Dashboard & Reporting
 - [ ] Chart components (line/bar) with tooltips
 - [ ] Reporting exports (CSV / PDF)
-- [ ] Drill-down links (e.g., overdue invoices view, recent payments)
+- [x] Drill-down links (overdue invoices, unapplied payments, AR aging)
 - [ ] KPI variance vs prior period
 
-- [ ] Invoice detail: surface payment applications (pending API endpoint)
+- [x] Invoice detail: surface payment applications
 - [ ] Overdue invoices quick actions (reminders, mark sent)
 
 ### Accounts Payable (Future)
@@ -128,6 +128,17 @@
 
 ## 📝 Development Log
 
+### October 17, 2025
+Quick wins implemented
+- ✅ Money formatting applied across Payments (list/create/detail)
+- ✅ CSV export added to Trial Balance, Profit & Loss, Balance Sheet, and A/R Aging
+- ✅ Standardized toasts on login success/error
+UI/UX polish
+- ✅ Invoices list uses currency formatting
+- ✅ Dashboard: tooltips on Net Income chart bars
+- ✅ Dashboard: drill‑down links to Overdue Invoices, Unapplied Payments, and A/R Aging
+- ✅ Dashboard: Cash on Hand trend chart
+
 ### October 16, 2025
 **Dashboard & Reporting Progress**
 - ✅ Middleware‑protected API consumed with JWT and refresh
@@ -169,8 +180,8 @@
 
 ### Milestone 5: Reporting Exports ⏳
 **Target:** October 20, 2025  
-**Status:** Not Started
-- [ ] CSV export for each report
+**Status:** In Progress
+- [x] CSV export for each report
 - [ ] Chart polish
 - [ ] Documentation for financial report usage
 

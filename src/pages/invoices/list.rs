@@ -1,14 +1,16 @@
 use leptos::*;
-use leptos_router::A;
+use leptos_router::{A, use_query_map};
 use uuid::Uuid;
 
 use crate::api::invoices as api;
 use crate::types::invoices::{Invoice, InvoiceStatus};
+use crate::utils::format::format_money;
 
 #[component]
 pub fn InvoicesList() -> impl IntoView {
     let (status, set_status) = create_signal(None::<InvoiceStatus>);
     let (customer_id_str, set_customer_id_str) = create_signal(String::new());
+    let query_map = use_query_map();
 
     let invoices = create_resource(
         move || (status.get(), customer_id_str.get()),
@@ -17,6 +19,25 @@ pub fn InvoicesList() -> impl IntoView {
             api::list_invoices(customer_id, s, Some(100), None).await
         },
     );
+
+    // Initialize filters from query params (?status=overdue&customer=<uuid>)
+    create_effect(move |_| {
+        let qs_status = query_map.with(|q| q.get("status").cloned());
+        if let Some(s) = qs_status {
+            let st = match s.to_lowercase().as_str() {
+                "draft" => Some(InvoiceStatus::Draft),
+                "sent" => Some(InvoiceStatus::Sent),
+                "paid" => Some(InvoiceStatus::Paid),
+                "partial" => Some(InvoiceStatus::Partial),
+                "overdue" => Some(InvoiceStatus::Overdue),
+                "void" => Some(InvoiceStatus::Void),
+                _ => None,
+            };
+            if st.is_some() { set_status.set(st); }
+        }
+        let qs_customer = query_map.with(|q| q.get("customer").cloned());
+        if let Some(cid) = qs_customer { set_customer_id_str.set(cid); }
+    });
 
     view! {
         <div class="p-6">
@@ -86,8 +107,8 @@ fn InvoicesTable(items: Vec<Invoice>) -> impl IntoView {
                         <td class="py-2 px-3"><A class="text-akowe-blue-600 hover:underline" href=format!("/invoices/{}", inv.id)>{inv.invoice_number.clone()}</A></td>
                         <td class="py-2 px-3">{inv.invoice_date.to_string()}</td>
                         <td class="py-2 px-3">{inv.due_date.to_string()}</td>
-                        <td class="py-2 px-3">{inv.total_amount.to_string()}</td>
-                        <td class="py-2 px-3">{inv.balance.to_string()}</td>
+                        <td class="py-2 px-3">{format_money(&inv.total_amount)}</td>
+                        <td class="py-2 px-3">{format_money(&inv.balance)}</td>
                         <td class="py-2 px-3"><span class="text-xs px-2 py-1 rounded bg-gray-100 text-gray-700 border">{format!("{:?}", inv.status).to_lowercase()}</span></td>
                     </tr>
                 }).collect_view()}
@@ -95,4 +116,3 @@ fn InvoicesTable(items: Vec<Invoice>) -> impl IntoView {
         </table>
     }
 }
-

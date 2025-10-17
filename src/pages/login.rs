@@ -2,7 +2,7 @@ use leptos::*;
 use leptos_router::use_navigate;
 
 use crate::api::auth as api_auth;
-use crate::state::AuthContext;
+use crate::state::{AuthContext, ToastContext, ToastKind, Toaster};
 
 #[component]
 pub fn Login() -> impl IntoView {
@@ -12,18 +12,23 @@ pub fn Login() -> impl IntoView {
     let navigate = use_navigate();
     let auth = expect_context::<AuthContext>();
 
+    // Provide toast context for this public route
+    let toaster = ToastContext::provide();
+
     let on_submit = create_action(move |_: &()| {
         let username = username.get();
         let password = password.get();
         let navigate = navigate.clone();
+        let toaster = toaster.clone();
         async move {
             set_error.set(None);
             match api_auth::login(username, password).await {
                 Ok(resp) => {
                     auth.set_user.set(Some(resp.user));
+                    toaster.push("Signed in", ToastKind::Success);
                     navigate("/dashboard", Default::default());
                 }
-                Err(e) => set_error.set(Some(e)),
+                Err(e) => { toaster.push(e.clone(), ToastKind::Error); set_error.set(Some(e)); }
             }
         }
     });
@@ -46,6 +51,6 @@ pub fn Login() -> impl IntoView {
                 <button class="bg-blue-600 text-white px-4 py-2 rounded" type="submit">"Sign In"</button>
             </form>
         </div>
+        <Toaster />
     }
 }
-

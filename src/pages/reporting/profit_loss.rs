@@ -33,7 +33,12 @@ pub fn ProfitLossPage() -> impl IntoView {
 
             <Transition fallback=move || view!{ <div>"Loading..."</div> }>
                 {move || match report.get() {
-                    Some(Ok(pl)) => view!{ <ProfitLossTable pl=pl/> }.into_view(),
+                    Some(Ok(pl)) => view!{
+                        <div class="flex items-center justify-end mb-2">
+                            <ProfitLossExportButton pl=pl.clone()/>
+                        </div>
+                        <ProfitLossTable pl=pl/>
+                    }.into_view(),
                     Some(Err(e)) => view!{ <div class="text-red-600">{e}</div> }.into_view(),
                     None => view!{ <div/> }.into_view(),
                 }}
@@ -87,4 +92,48 @@ fn ProfitLossTable(pl: ProfitLossStatement) -> impl IntoView {
             </div>
         </div>
     }
+}
+
+#[component]
+fn ProfitLossExportButton(pl: ProfitLossStatement) -> impl IntoView {
+    // Build CSV: Section,Account Code,Account Name,Amount
+    let csv = {
+        let mut lines: Vec<String> = Vec::new();
+        lines.push("Section,Account Code,Account Name,Amount".to_string());
+        for e in &pl.revenue_entries {
+            let name = escape_csv(&e.account_name);
+            lines.push(format!("Revenue,{},{},{}",
+                e.account_code,
+                name,
+                crate::utils::format::format_money_csv(&e.amount)
+            ));
+        }
+        lines.push(format!("Total Revenue,,,{}", crate::utils::format::format_money_csv(&pl.total_revenue)));
+        for e in &pl.expense_entries {
+            let name = escape_csv(&e.account_name);
+            lines.push(format!("Expenses,{},{},{}",
+                e.account_code,
+                name,
+                crate::utils::format::format_money_csv(&e.amount)
+            ));
+        }
+        lines.push(format!("Total Expenses,,,{}", crate::utils::format::format_money_csv(&pl.total_expenses)));
+        lines.push(format!("Net Income,,,{}", crate::utils::format::format_money_csv(&pl.net_income)));
+        lines.join("\n")
+    };
+
+    let href = {
+        let encoded = js_sys::encode_uri_component(&csv).as_string().unwrap_or_default();
+        format!("data:text/csv;charset=utf-8,{}", encoded)
+    };
+    let filename = format!("profit_loss_{}_to_{}.csv", pl.period_start.to_string(), pl.period_end.to_string());
+
+    view! { <a class="text-sm underline text-akowe-blue-600" href={href} download={filename}>"Export CSV"</a> }
+}
+
+fn escape_csv(s: &str) -> String {
+    let mut out = s.replace('"', "\"\"");
+    out.insert(0, '"');
+    out.push('"');
+    out
 }

@@ -28,7 +28,12 @@ pub fn ARAgingPage() -> impl IntoView {
 
             <Transition fallback=move || view!{ <div>"Loading..."</div> }>
                 {move || match report.get() {
-                    Some(Ok(ar)) => view!{ <AgingTable ar=ar/> }.into_view(),
+                    Some(Ok(ar)) => view!{
+                        <div class="flex items-center justify-end mb-2">
+                            <ARAgingExportButton ar=ar.clone()/>
+                        </div>
+                        <AgingTable ar=ar/>
+                    }.into_view(),
                     Some(Err(e)) => view!{ <div class="text-red-600">{e}</div> }.into_view(),
                     None => view!{ <div/> }.into_view(),
                 }}
@@ -75,4 +80,40 @@ fn AgingTable(ar: AccountsReceivableAging) -> impl IntoView {
             </table>
         </div>
     }
+}
+
+#[component]
+fn ARAgingExportButton(ar: AccountsReceivableAging) -> impl IntoView {
+    let csv = {
+        let mut lines: Vec<String> = Vec::new();
+        lines.push("Customer,Current,1-30,31-60,61-90,91+,Total".to_string());
+        for b in &ar.buckets {
+            lines.push(format!("{},{},{},{},{},{},{}",
+                escape_csv(&b.customer_name),
+                crate::utils::format::format_money_csv(&b.current),
+                crate::utils::format::format_money_csv(&b.days_1_30),
+                crate::utils::format::format_money_csv(&b.days_31_60),
+                crate::utils::format::format_money_csv(&b.days_61_90),
+                crate::utils::format::format_money_csv(&b.days_91_plus),
+                crate::utils::format::format_money_csv(&b.total)
+            ));
+        }
+        lines.push(format!("Total Outstanding,,,,,,{}", crate::utils::format::format_money_csv(&ar.total_outstanding)));
+        lines.join("\n")
+    };
+
+    let href = {
+        let encoded = js_sys::encode_uri_component(&csv).as_string().unwrap_or_default();
+        format!("data:text/csv;charset=utf-8,{}", encoded)
+    };
+    let filename = format!("ar_aging_{}.csv", ar.as_of_date.to_string());
+
+    view! { <a class="text-sm underline text-akowe-blue-600" href={href} download={filename}>"Export CSV"</a> }
+}
+
+fn escape_csv(s: &str) -> String {
+    let mut out = s.replace('"', "\"\"");
+    out.insert(0, '"');
+    out.push('"');
+    out
 }

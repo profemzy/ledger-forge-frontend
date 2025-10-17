@@ -17,6 +17,12 @@ struct NetIncomePoint {
     amount: Decimal,
 }
 
+#[derive(Clone, Debug, serde::Deserialize, serde::Serialize)]
+struct CashPoint {
+    label: String,
+    amount: Decimal,
+}
+
 fn today_ymd() -> String {
     // Use JS Date to get today's date in YYYY-MM-DD
     let d = js_sys::Date::new_0();
@@ -55,6 +61,7 @@ pub fn Dashboard() -> impl IntoView {
     let recent_transactions = create_resource(|| (), |_| async move { tx_api::list_transactions(None, None, Some(5)).await });
     let recent_payments = create_resource(|| (), |_| async move { pay_api::list_payments().await.map(|mut list| { list.sort_by(|a, b| b.payment_date.cmp(&a.payment_date)); list.into_iter().take(5).collect::<Vec<_>>() }) });
     let income_history = create_resource(|| (), |_| async move { fetch_net_income_history(6).await });
+    let cash_history = create_resource(|| (), |_| async move { fetch_cash_history(6).await });
 
     view! {
         <div class="p-6 space-y-6">
@@ -129,6 +136,7 @@ pub fn Dashboard() -> impl IntoView {
                             {move || ar_res.get().map(|r| match r { Ok(ar) => format_money(&ar.total_outstanding), Err(_) => "—".into() })}
                         </Transition>
                     </div>
+                    <div class="mt-2"><A class="text-akowe-blue-600 hover:underline" href="/reports/ar-aging">"View A/R Aging"</A></div>
                 </div>
                 // Overdue Invoices
                 <div class="bg-white rounded shadow p-4">
@@ -144,7 +152,7 @@ pub fn Dashboard() -> impl IntoView {
                             })}
                         </Transition>
                     </div>
-                    <div class="mt-2"><A class="text-akowe-blue-600 hover:underline" href="/invoices">"View invoices"</A></div>
+                    <div class="mt-2"><A class="text-akowe-blue-600 hover:underline" href="/invoices?status=overdue">"View invoices"</A></div>
                 </div>
                 // Unapplied Payments
                 <div class="bg-white rounded shadow p-4">
@@ -160,7 +168,7 @@ pub fn Dashboard() -> impl IntoView {
                             })}
                         </Transition>
                     </div>
-                    <div class="mt-2"><A class="text-akowe-blue-600 hover:underline" href="/payments">"View payments"</A></div>
+                    <div class="mt-2"><A class="text-akowe-blue-600 hover:underline" href="/payments?unapplied=true">"View payments"</A></div>
                 </div>
             </div>
 
@@ -173,6 +181,8 @@ pub fn Dashboard() -> impl IntoView {
             </div>
 
             <NetIncomeChart res=income_history.clone()/ >
+
+            <CashTrendChart res=cash_history.clone()/ >
 
             <div class="grid grid-cols-1 lg:grid-cols-2 gap-4">
                 <RecentTransactionsView res=recent_transactions.clone()/ >
@@ -298,10 +308,11 @@ fn NetIncomeChart(res: Resource<(), Result<Vec<NetIncomePoint>, String>>) -> imp
                                     {entries.into_iter().map(|pt| {
                                         let height_px = (pt.amount.abs().to_f64().unwrap_or(0.0) / max_f * 120.0).max(4.0);
                                         let bar_class = if pt.amount >= Decimal::ZERO { "bg-green-500" } else { "bg-red-500" };
+                                        let tooltip = format!("{}: {}", pt.label.clone(), format_money(&pt.amount));
                                         view!{
-                                            <div class="flex flex-col items-center gap-1 w-12">
-                                                <div class="w-full bg-gray-200 rounded-sm h-32 flex items-end">
-                                                    <div class=bar_class style=format!("height: {:.1}px; width: 100%;", height_px)></div>
+                                            <div class="flex flex-col items-center gap-1 w-12" title=tooltip.clone()>
+                                                <div class="w-full bg-gray-200 rounded-sm h-32 flex items-end" title=tooltip.clone()>
+                                                    <div class=bar_class style=format!("height: {:.1}px; width: 100%;", height_px) title=tooltip.clone()></div>
                                                 </div>
                                                 <div class="text-xs text-gray-600">{pt.label.clone()}</div>
                                                 <div class="text-xs font-mono">{format_money(&pt.amount)}</div>
@@ -341,4 +352,65 @@ async fn fetch_net_income_history(months: usize) -> Result<Vec<NetIncomePoint>, 
         points.push(NetIncomePoint { label, amount: pl.net_income });
     }
     Ok(points)
+}
+
+async fn fetch_cash_history(months: usize) -> Result<Vec<CashPoint>, String> {
+    let mut points = Vec::new();
+    for (label, _start, end) in last_n_months(months) {
+        let end_str = end.to_string();
+        match reporting::get_balance_sheet(&end_str).await {
+            Ok(bs) => {
+                let total_cash = bs.asset_entries.iter()
+                    .filter(|entry| {
+                        let name = entry.account_name.to_lowercase();
+                        name.contains("cash") || entry.account_code.starts_with("10")
+                    })
+                    .fold(Decimal::ZERO, |acc, entry| acc + entry.amount);
+                points.push(CashPoint { label, amount: total_cash });
+            }
+            Err(e) => return Err(e),
+        }
+    }
+    Ok(points)
+}
+
+#[component]
+fn CashTrendChart(res: Resource<(), Result<Vec<CashPoint>, String>>) -> impl IntoView {
+    view! {
+        <div class="bg-white rounded shadow p-4">
+            <div class="text-lg font-semibold mb-2">"Cash on Hand (last 6 months)"</div>
+            <Transition fallback=move || view!{ <div>"Loading..."</div> }>
+                {move || match res.get() {
+                    Some(Ok(points)) => {
+                        if points.is_empty() {
+                            view!{ <div class="text-gray-600">"No data."</div> }.into_view()
+                        } else {
+                            let entries = points.clone();
+                            let max_abs = entries.iter().map(|p| p.amount.abs()).fold(Decimal::ZERO, |acc, x| if x > acc { x } else { acc });
+                            let max_f = max_abs.to_f64().unwrap_or(1.0).max(0.01);
+                            view!{
+                                <div class="flex items-end gap-3 h-40">
+                                    {entries.into_iter().map(|pt| {
+                                        let height_px = (pt.amount.abs().to_f64().unwrap_or(0.0) / max_f * 120.0).max(4.0);
+                                        let tooltip = format!("{}: {}", pt.label.clone(), format_money(&pt.amount));
+                                        view!{
+                                            <div class="flex flex-col items-center gap-1 w-12" title=tooltip.clone()>
+                                                <div class="w-full bg-gray-200 rounded-sm h-32 flex items-end" title=tooltip.clone()>
+                                                    <div class="bg-blue-500" style=format!("height: {:.1}px; width: 100%;", height_px) title=tooltip.clone()></div>
+                                                </div>
+                                                <div class="text-xs text-gray-600">{pt.label.clone()}</div>
+                                                <div class="text-xs font-mono">{format_money(&pt.amount)}</div>
+                                            </div>
+                                        }
+                                    }).collect_view()}
+                                </div>
+                            }.into_view()
+                        }
+                    }
+                    Some(Err(e)) => view!{ <div class="text-red-600">{e}</div> }.into_view(),
+                    None => view!{ <div/> }.into_view(),
+                }}
+            </Transition>
+        </div>
+    }
 }

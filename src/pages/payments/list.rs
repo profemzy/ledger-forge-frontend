@@ -1,16 +1,18 @@
 use leptos::*;
 use uuid::Uuid;
-use leptos_router::A;
+use leptos_router::{A, use_query_map};
 
 use crate::api::payments as api;
 use crate::api::contacts as contacts_api;
 use crate::types::payments::Payment;
+use crate::utils::format::format_money;
 use crate::types::contacts::Contact;
 
 #[component]
 pub fn PaymentsList() -> impl IntoView {
     let (show_unapplied, set_show_unapplied) = create_signal(false);
     let (customer_id_str, set_customer_id_str) = create_signal(String::new());
+    let query_map = use_query_map();
 
     let payments = create_resource(
         move || (show_unapplied.get(), customer_id_str.get()),
@@ -22,6 +24,14 @@ pub fn PaymentsList() -> impl IntoView {
             Ok::<_, String>(items)
         },
     );
+
+    // Initialize filters from query params (?unapplied=true&customer=<uuid>)
+    create_effect(move |_| {
+        let qs_unapplied = query_map.with(|q| q.get("unapplied").cloned());
+        if let Some(u) = qs_unapplied { if u.to_lowercase() == "true" { set_show_unapplied.set(true); } }
+        let qs_customer = query_map.with(|q| q.get("customer").cloned());
+        if let Some(cid) = qs_customer { set_customer_id_str.set(cid); }
+    });
 
     // Contacts for mapping customer names
     let contacts_res = create_resource(|| (), |_| async move { contacts_api::list_contacts().await });
@@ -80,8 +90,8 @@ fn PaymentsTable(items: Vec<Payment>, contacts: Option<std::collections::HashMap
                             <td class="py-2 px-3">{p.payment_date.to_string()}</td>
                             <td class="py-2 px-3 font-mono text-sm"><A class="text-akowe-blue-600 hover:underline" href=format!("/payments/{}", p.id)>{p.payment_number.unwrap_or_else(|| "—".into())}</A></td>
                             <td class="py-2 px-3">{cname}</td>
-                            <td class="py-2 px-3">{p.amount.to_string()}</td>
-                            <td class="py-2 px-3">{p.unapplied_amount.unwrap_or_default().to_string()}</td>
+                            <td class="py-2 px-3">{format_money(&p.amount)}</td>
+                            <td class="py-2 px-3">{format_money(&p.unapplied_amount.unwrap_or_default())}</td>
                             <td class="py-2 px-3">{p.payment_method.clone()}</td>
                         </tr>
                     }

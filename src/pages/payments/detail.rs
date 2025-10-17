@@ -96,7 +96,7 @@ pub fn PaymentDetail() -> impl IntoView {
                                                     <td class="py-2 px-3"><A class="text-akowe-blue-600 hover:underline" href=format!("/invoices/{}", inv.id)>{inv.invoice_number.clone()}</A></td>
                                                     <td class="py-2 px-3">{inv.invoice_date.to_string()}</td>
                                                     <td class="py-2 px-3">{inv.due_date.to_string()}</td>
-                                                    <td class="py-2 px-3">{inv.balance.to_string()}</td>
+                                                            <td class="py-2 px-3">{format_money(&inv.balance)}</td>
                                                     <td class="py-2 px-3">
                                                         <input class="border rounded px-2 py-1 w-32" type="text" inputmode="decimal" placeholder="0.00"
                                                             on:input=move |e| {
