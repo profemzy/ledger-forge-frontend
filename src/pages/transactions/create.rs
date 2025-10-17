@@ -2,7 +2,7 @@ use chrono::NaiveDate;
 use leptos::*;
 use leptos_router::use_navigate;
 use rust_decimal::Decimal;
-use crate::utils::format::format_money;
+use crate::utils::format::{format_money, mask_money_input};
 use uuid::Uuid;
 
 use crate::api::{transactions as tx_api, accounts as accounts_api, contacts as contacts_api};
@@ -216,13 +216,13 @@ pub fn TransactionCreate() -> impl IntoView {
                                             <td class="py-2 px-3">
                                                 <input class="border rounded px-2 py-1 w-32" type="text" inputmode="decimal" placeholder="0.00"
                                                     prop:value=r.debit.clone()
-                                                    on:input=move |e| set_rows.update(|v| { v[i].debit = event_target_value(&e); if !v[i].debit.is_empty() { v[i].credit.clear(); } })
+                                                    on:input=move |e| set_rows.update(|v| { v[i].debit = mask_money_input(&event_target_value(&e)); if !v[i].debit.is_empty() { v[i].credit.clear(); } })
                                                 />
                                             </td>
                                             <td class="py-2 px-3">
                                                 <input class="border rounded px-2 py-1 w-32" type="text" inputmode="decimal" placeholder="0.00"
                                                     prop:value=r.credit.clone()
-                                                    on:input=move |e| set_rows.update(|v| { v[i].credit = event_target_value(&e); if !v[i].credit.is_empty() { v[i].debit.clear(); } })
+                                                    on:input=move |e| set_rows.update(|v| { v[i].credit = mask_money_input(&event_target_value(&e)); if !v[i].credit.is_empty() { v[i].debit.clear(); } })
                                                 />
                                             </td>
                                             <td class="py-2 px-3 text-right">

@@ -29,8 +29,9 @@ pub fn BalanceSheetPage() -> impl IntoView {
             <Transition fallback=move || view!{ <div>"Loading..."</div> }>
                 {move || match report.get() {
                     Some(Ok(bs)) => view!{
-                        <div class="flex items-center justify-end mb-2">
+                        <div class="flex items-center justify-end gap-3 mb-2">
                             <BalanceSheetExportButton bs=bs.clone()/>
+                            <button class="text-sm underline text-gray-700" on:click=move |_| { if let Some(w) = web_sys::window() { w.print().ok(); } } >"Print PDF"</button>
                         </div>
                         <BalanceSheetTable bs=bs/>
                     }.into_view(),

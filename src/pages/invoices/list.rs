@@ -3,8 +3,10 @@ use leptos_router::{A, use_query_map};
 use uuid::Uuid;
 
 use crate::api::invoices as api;
+use crate::components::ui::{ButtonLink, Table};
 use crate::types::invoices::{Invoice, InvoiceStatus};
 use crate::utils::format::format_money;
+use crate::state::{ToastContext, ToastKind};
 
 #[component]
 pub fn InvoicesList() -> impl IntoView {
@@ -43,14 +45,11 @@ pub fn InvoicesList() -> impl IntoView {
         <div class="p-6">
             <div class="flex items-center justify-between mb-4">
                 <h1 class="text-2xl font-semibold">"Invoices"</h1>
-                <A href="/invoices/new" class="bg-blue-600 text-white px-4 py-2 rounded">"New Invoice"</A>
+                <ButtonLink href="/invoices/new" variant="primary">{"New Invoice"}</ButtonLink>
             </div>
 
             <div class="flex gap-4 mb-4 items-center">
-                <input class="border rounded px-3 py-2 w-72" type="text" placeholder="Filter by Customer ID (UUID)"
-                    prop:value=move || customer_id_str.get()
-                    on:input=move |e| set_customer_id_str.set(event_target_value(&e))
-                />
+                <crate::components::ui::TextInput value=customer_id_str set_value=set_customer_id_str placeholder="Filter by Customer ID (UUID)" class="border rounded px-3 py-2 w-72" inputmode="text" />
                 <select class="border rounded px-2 py-1"
                     on:change=move |e| {
                         let v = event_target_value(&e);
@@ -78,7 +77,7 @@ pub fn InvoicesList() -> impl IntoView {
 
             <Transition fallback=move || view!{ <div>"Loading invoices..."</div> }>
                 {move || match invoices.get() {
-                    Some(Ok(list)) => view!{ <InvoicesTable items=list/> }.into_view(),
+                    Some(Ok(list)) => view!{ <InvoicesTable items=list invoices_res=invoices.clone()/> }.into_view(),
                     Some(Err(e)) => view!{ <div class="text-red-600">{e}</div> }.into_view(),
                     None => view!{ <div/> }.into_view(),
                 }}
@@ -88,31 +87,50 @@ pub fn InvoicesList() -> impl IntoView {
 }
 
 #[component]
-fn InvoicesTable(items: Vec<Invoice>) -> impl IntoView {
+fn InvoicesTable(items: Vec<Invoice>, invoices_res: Resource<(Option<InvoiceStatus>, String), Result<Vec<Invoice>, String>>) -> impl IntoView {
+    let toaster = use_context::<ToastContext>();
+    let mark_sent = create_action(move |id: &Uuid| {
+        let id = *id;
+        let toaster = toaster.clone();
+        let invoices_res = invoices_res.clone();
+        async move {
+            match api::update_invoice_status(id, InvoiceStatus::Sent).await {
+                Ok(_) => { if let Some(t) = toaster { t.push("Invoice marked sent", ToastKind::Success); } invoices_res.refetch(); }
+                Err(e) => { if let Some(t) = toaster { t.push(e, ToastKind::Error); } }
+            }
+        }
+    });
     view! {
-        <table class="w-full border-collapse bg-white rounded shadow">
+        <Table>
             <thead>
-                <tr class="text-left border-b">
+                <tr class="text-left border-b bg-gray-50">
                     <th class="py-2 px-3 text-gray-600">"Number"</th>
                     <th class="py-2 px-3 text-gray-600">"Date"</th>
                     <th class="py-2 px-3 text-gray-600">"Due"</th>
                     <th class="py-2 px-3 text-gray-600">"Total"</th>
                     <th class="py-2 px-3 text-gray-600">"Balance"</th>
                     <th class="py-2 px-3 text-gray-600">"Status"</th>
+                    <th class="py-2 px-3 text-gray-600 text-right">"Actions"</th>
                 </tr>
             </thead>
             <tbody>
                 {items.into_iter().map(|inv| view!{
-                    <tr class="border-b hover:bg-gray-50">
+                    <tr class="border-b hover:bg-gray-50 dark:hover:bg-gray-800">
                         <td class="py-2 px-3"><A class="text-akowe-blue-600 hover:underline" href=format!("/invoices/{}", inv.id)>{inv.invoice_number.clone()}</A></td>
                         <td class="py-2 px-3">{inv.invoice_date.to_string()}</td>
                         <td class="py-2 px-3">{inv.due_date.to_string()}</td>
                         <td class="py-2 px-3">{format_money(&inv.total_amount)}</td>
                         <td class="py-2 px-3">{format_money(&inv.balance)}</td>
                         <td class="py-2 px-3"><span class="text-xs px-2 py-1 rounded bg-gray-100 text-gray-700 border">{format!("{:?}", inv.status).to_lowercase()}</span></td>
+                        <td class="py-2 px-3 text-right">
+                            {if matches!(inv.status, InvoiceStatus::Overdue) {
+                                let id = inv.id;
+                                view!{ <button class="text-xs text-blue-700 hover:underline" on:click=move |_| mark_sent.dispatch(id)>"Mark Sent"</button> }.into_view()
+                            } else { view!{ <span class="text-xs text-gray-400">"—"</span> }.into_view() }}
+                        </td>
                     </tr>
                 }).collect_view()}
             </tbody>
-        </table>
+        </Table>
     }
 }

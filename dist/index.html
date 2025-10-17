@@ -8,6 +8,7 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <script>
       tailwind.config = {
+        darkMode: 'class',
         theme: {
           extend: {
             colors: {
@@ -21,12 +22,34 @@
           }
         }
       }
-    </script>
+  </script>
+  <style>
+    @media print {
+      aside, header, footer { display: none !important; }
+      main { padding: 0 !important; }
+      body { background: #fff !important; }
+    }
+    /* Dark mode global overrides to catch plain elements */
+    .dark .bg-white { background-color: #111827 !important; }
+    .dark .bg-gray-50 { background-color: #1f2937 !important; }
+    .dark thead tr { background-color: #1f2937 !important; color: #e5e7eb !important; }
+    .dark input[type="text"],
+    .dark input[type="date"],
+    .dark input[type="number"],
+    .dark select,
+    .dark textarea {
+      background-color: #1f2937 !important; /* gray-800 */
+      color: #e5e7eb !important;            /* gray-200 */
+      border-color: #374151 !important;     /* gray-700 */
+    }
+    .dark input::placeholder,
+    .dark textarea::placeholder { color: #9ca3af !important; }
+  </style>
     <!-- Instruct Trunk to compile the Rust crate and inject JS/WASM. Disable SRI in dev to avoid hash mismatches. -->
     
 <script type="module">
-import init, * as bindings from '/akowe-ed78a53d24c9c0b6.js';
-const wasm = await init({ module_or_path: '/akowe-ed78a53d24c9c0b6_bg.wasm' });
+import init, * as bindings from '/akowe-7d6cd347326e54a1.js';
+const wasm = await init({ module_or_path: '/akowe-7d6cd347326e54a1_bg.wasm' });
 
 
 window.wasmBindings = bindings;
@@ -38,8 +61,8 @@ dispatchEvent(new CustomEvent("TrunkApplicationStarted", {detail: {wasm}}));
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
-<link rel="modulepreload" href="/akowe-ed78a53d24c9c0b6.js" crossorigin="anonymous" integrity="sha384-fpx8+XzzD4zAcLcpUAHbGhHsteXsSWeYrSDLIcbM8AlUJubGYppIHGqWmBqqGTHR"><link rel="preload" href="/akowe-ed78a53d24c9c0b6_bg.wasm" crossorigin="anonymous" integrity="sha384-nn+1J855iH6csZGhQpk3lSmtcXLXBZYBq3R1/hlmsDOpU8jBuzjbu5GjMjT6GuhL" as="fetch" type="application/wasm"></head>
-<body class="font-sans bg-gray-50 text-gray-900">
+<link rel="modulepreload" href="/akowe-7d6cd347326e54a1.js" crossorigin="anonymous" integrity="sha384-zPVdT98ddqBq94vzp8iJdYAapfERYK6CDWBZtYoGpdQOt/0SwwPHp2X8ybtHKObm"><link rel="preload" href="/akowe-7d6cd347326e54a1_bg.wasm" crossorigin="anonymous" integrity="sha384-O4gTp4Tfsc1bTjZTowvl9G83T+wCMFbFkpwkLc7ssVvTpILedGKH/XQgDN+dzn1H" as="fetch" type="application/wasm"></head>
+<body class="font-sans bg-gray-50 text-gray-900 dark:bg-gray-950 dark:text-gray-100">
     <noscript>You need to enable JavaScript to run this app.</noscript>
 <script>"use strict";
 

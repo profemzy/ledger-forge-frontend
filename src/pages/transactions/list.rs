@@ -2,6 +2,7 @@ use leptos::*;
 use leptos_router::A;
 
 use crate::api::transactions as api;
+use crate::components::ui::{ButtonLink, Table};
 use crate::types::transactions::{Transaction, TransactionStatus};
 use uuid::Uuid;
 
@@ -24,7 +25,7 @@ pub fn TransactionsList() -> impl IntoView {
         <div class="p-6">
             <div class="flex items-center justify-between mb-4">
                 <h1 class="text-2xl font-semibold">"Transactions"</h1>
-                <A href="/transactions/new" class="bg-blue-600 text-white px-4 py-2 rounded">"New Transaction"</A>
+                <ButtonLink href="/transactions/new" variant="primary">{"New Transaction"}</ButtonLink>
             </div>
 
             <div class="flex gap-4 mb-4 items-center">
@@ -97,9 +98,9 @@ pub fn TransactionsList() -> impl IntoView {
 #[component]
 fn TxTable(txs: Vec<Transaction>) -> impl IntoView {
     view! {
-        <table class="w-full border-collapse bg-white rounded shadow">
+        <Table>
             <thead>
-                <tr class="text-left border-b">
+                <tr class="text-left border-b bg-gray-50">
                     <th class="py-2 px-3 text-gray-600">"Date"</th>
                     <th class="py-2 px-3 text-gray-600">"Description"</th>
                     <th class="py-2 px-3 text-gray-600">"Reference"</th>
@@ -108,7 +109,7 @@ fn TxTable(txs: Vec<Transaction>) -> impl IntoView {
             </thead>
             <tbody>
                 {txs.into_iter().map(|t| view! {
-                    <tr class="border-b hover:bg-gray-50">
+                    <tr class="border-b hover:bg-gray-50 dark:hover:bg-gray-800">
                         <td class="py-2 px-3">{t.transaction_date.to_string()}</td>
                         <td class="py-2 px-3"><A class="text-akowe-blue-600 hover:underline" href=format!("/transactions/{}", t.id)>{t.description.unwrap_or_else(|| "—".into())}</A></td>
                         <td class="py-2 px-3 font-mono text-sm">{t.reference_number.unwrap_or_else(|| "—".into())}</td>
@@ -122,6 +123,6 @@ fn TxTable(txs: Vec<Transaction>) -> impl IntoView {
                     </tr>
                 }).collect_view()}
             </tbody>
-        </table>
+        </Table>
     }
 }

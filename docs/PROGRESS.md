@@ -75,7 +75,7 @@
 
 ### Dashboard & Reporting
 - [ ] Chart components (line/bar) with tooltips
-- [ ] Reporting exports (CSV / PDF)
+- [x] Reporting exports (CSV / PDF)
 - [x] Drill-down links (overdue invoices, unapplied payments, AR aging)
 - [ ] KPI variance vs prior period
 
@@ -86,9 +86,9 @@
 - [ ] Bills & bill payments UI
 
 ### Polish
-- [ ] Client-side numeric formatting / masking for money & quantities
-- [ ] Extract reusable UI primitives (Button, Input, Table, Modal)
-- [ ] Light/dark theme tokens & spacing scale review
+- [x] Client-side numeric formatting / masking for money & quantities
+- [x] Extract reusable UI primitives (Button, Input, Table) (Modal later)
+- [x] Light/dark theme toggle with class strategy
 
 ---
 
@@ -138,6 +138,9 @@ UI/UX polish
 - ✅ Dashboard: tooltips on Net Income chart bars
 - ✅ Dashboard: drill‑down links to Overdue Invoices, Unapplied Payments, and A/R Aging
 - ✅ Dashboard: Cash on Hand trend chart
+- ✅ Dashboard charts: compact amounts + horizontal scroll to prevent overlap
+- ✅ Sidebar and header styling polish (active states, sticky header)
+- ✅ Introduced UI kit (Button, ButtonLink, Card); applied to list pages
 
 ### October 16, 2025
 **Dashboard & Reporting Progress**
@@ -176,12 +179,13 @@ UI/UX polish
 - [x] Metrics (AR, assets/liabilities/equity, cash on hand)
 - [x] Recent activity widgets
 - [ ] Rich charts (cash & net income trends with tooltips)
-- [ ] Drill-down links to detailed views
+- [x] Drill-down links to detailed views
 
 ### Milestone 5: Reporting Exports ⏳
 **Target:** October 20, 2025  
 **Status:** In Progress
 - [x] CSV export for each report
+- [x] Print-to-PDF buttons added
 - [ ] Chart polish
 - [ ] Documentation for financial report usage
 

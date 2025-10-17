@@ -2,6 +2,7 @@ use leptos::*;
 use leptos_router::A;
 
 use crate::api::accounts as api;
+use crate::components::ui::{ButtonLink, Table};
 use crate::types::accounts::{Account, AccountType};
 
 #[component]
@@ -19,7 +20,7 @@ pub fn AccountsList() -> impl IntoView {
         <div class="p-6">
             <div class="flex items-center justify-between mb-4">
                 <h1 class="text-2xl font-semibold">"Accounts"</h1>
-                <A href="/accounts/new" class="bg-blue-600 text-white px-4 py-2 rounded">"New Account"</A>
+                <ButtonLink href="/accounts/new" variant="primary">{"New Account"}</ButtonLink>
             </div>
 
             <div class="flex flex-wrap gap-4 mb-4 items-center">
@@ -94,9 +95,9 @@ pub fn AccountsList() -> impl IntoView {
 #[component]
 fn AccountsTable(accounts: Vec<Account>) -> impl IntoView {
     view! {
-        <table class="w-full border-collapse bg-white rounded shadow">
+        <Table>
             <thead>
-                <tr class="text-left border-b">
+                <tr class="text-left border-b bg-gray-50">
                     <th class="py-2 px-3 text-gray-600">"Code"</th>
                     <th class="py-2 px-3 text-gray-600">"Name"</th>
                     <th class="py-2 px-3 text-gray-600">"Type"</th>
@@ -105,7 +106,7 @@ fn AccountsTable(accounts: Vec<Account>) -> impl IntoView {
             </thead>
             <tbody>
                 {accounts.into_iter().map(|a| view! {
-                    <tr class="border-b hover:bg-gray-50">
+                    <tr class="border-b hover:bg-gray-50 dark:hover:bg-gray-800">
                         <td class="py-2 px-3 font-mono">{a.code.clone()}</td>
                         <td class="py-2 px-3"><A class="text-akowe-blue-600 hover:underline" href=format!("/accounts/{}", a.id)>{a.name.clone()}</A></td>
                         <td class="py-2 px-3">
@@ -117,6 +118,6 @@ fn AccountsTable(accounts: Vec<Account>) -> impl IntoView {
                     </tr>
                 }).collect_view()}
             </tbody>
-        </table>
+        </Table>
     }
 }

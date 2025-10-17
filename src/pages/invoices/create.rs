@@ -230,19 +230,19 @@ pub fn InvoiceCreate() -> impl IntoView {
                                         <td class="py-2 px-3">
                                             <input class="border rounded px-2 py-1 w-24" type="text" inputmode="decimal" placeholder="0.00"
                                                 prop:value=r.qty.clone()
-                                                on:input=move |e| set_rows.update(|v| v[i].qty = event_target_value(&e))
+                                                on:input=move |e| set_rows.update(|v| v[i].qty = crate::utils::format::mask_money_input(&event_target_value(&e)))
                                             />
                                         </td>
                                         <td class="py-2 px-3">
                                             <input class="border rounded px-2 py-1 w-24" type="text" inputmode="decimal" placeholder="0.00"
                                                 prop:value=r.unit.clone()
-                                                on:input=move |e| set_rows.update(|v| v[i].unit = event_target_value(&e))
+                                                on:input=move |e| set_rows.update(|v| v[i].unit = crate::utils::format::mask_money_input(&event_target_value(&e)))
                                             />
                                         </td>
                                         <td class="py-2 px-3">
                                             <input class="border rounded px-2 py-1 w-20" type="text" inputmode="decimal" placeholder="0"
                                                 prop:value=r.disc.clone()
-                                                on:input=move |e| set_rows.update(|v| v[i].disc = event_target_value(&e))
+                                                on:input=move |e| set_rows.update(|v| v[i].disc = crate::utils::format::mask_money_input(&event_target_value(&e)))
                                             />
                                         </td>
                                         <td class="py-2 px-3">

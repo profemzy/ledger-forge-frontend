@@ -34,8 +34,9 @@ pub fn ProfitLossPage() -> impl IntoView {
             <Transition fallback=move || view!{ <div>"Loading..."</div> }>
                 {move || match report.get() {
                     Some(Ok(pl)) => view!{
-                        <div class="flex items-center justify-end mb-2">
+                        <div class="flex items-center justify-end gap-3 mb-2">
                             <ProfitLossExportButton pl=pl.clone()/>
+                            <button class="text-sm underline text-gray-700" on:click=move |_| { if let Some(w) = web_sys::window() { w.print().ok(); } } >"Print PDF"</button>
                         </div>
                         <ProfitLossTable pl=pl/>
                     }.into_view(),

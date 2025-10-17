@@ -6,11 +6,12 @@ use uuid::Uuid;
 
 use crate::api::{payments as pay_api, contacts as contacts_api, invoices as inv_api, accounts as accounts_api};
 use crate::types::payments::{CreatePaymentRequest, PaymentApplicationRequest};
+use crate::components::ui::MoneyInput;
 use crate::types::contacts::Contact;
 use crate::types::invoices::Invoice;
 use crate::types::accounts::{Account, AccountType};
 use crate::state::{ToastContext, ToastKind};
-use crate::utils::format::format_money;
+use crate::utils::format::{format_money, mask_money_input};
 
 #[component]
 pub fn PaymentCreate() -> impl IntoView {
@@ -135,10 +136,7 @@ pub fn PaymentCreate() -> impl IntoView {
                     </div>
                     <div>
                         <label class="block mb-1">"Amount"</label>
-                        <input class="w-full border rounded px-3 py-2" type="text" inputmode="decimal" placeholder="0.00"
-                            prop:value=move || amount_str.get()
-                            on:input=move |e| set_amount_str.set(event_target_value(&e))
-                        />
+                        <MoneyInput value=amount_str set_value=set_amount_str placeholder="0.00" class="w-full border rounded px-3 py-2" />
                     </div>
                 </div>
 
@@ -218,7 +216,7 @@ pub fn PaymentCreate() -> impl IntoView {
                                                             <td class="py-2 px-3">
                                                                 <input class="border rounded px-2 py-1 w-32" type="text" inputmode="decimal" placeholder="0.00"
                                                                     on:input=move |e| {
-                                                                        let v = event_target_value(&e);
+                                                                        let v = mask_money_input(&event_target_value(&e));
                                                                         set_apps.update(|m| { m.insert(inv.id, v); });
                                                                     }
                                                                 />

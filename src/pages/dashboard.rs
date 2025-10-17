@@ -7,7 +7,7 @@ use chrono::Months;
 
 use crate::state::AuthContext;
 use crate::api::{invoices as inv_api, payments as pay_api, transactions as tx_api, reporting};
-use crate::utils::format::format_money;
+use crate::utils::format::{format_money, format_money_compact};
 use crate::types::transactions::Transaction;
 use crate::types::payments::Payment;
 
@@ -79,7 +79,7 @@ pub fn Dashboard() -> impl IntoView {
 
             <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-4">
                 // Total Assets
-                <div class="bg-white rounded shadow p-4">
+                <div class="bg-white dark:bg-gray-900 rounded shadow p-4">
                     <div class="text-sm text-gray-600">"Total Assets"</div>
                     <div class="text-2xl font-semibold mt-1">
                         <Transition fallback=|| view!{ <span>"—"</span> }>
@@ -88,7 +88,7 @@ pub fn Dashboard() -> impl IntoView {
                     </div>
                 </div>
                 // Total Liabilities
-                <div class="bg-white rounded shadow p-4">
+                <div class="bg-white dark:bg-gray-900 rounded shadow p-4">
                     <div class="text-sm text-gray-600">"Total Liabilities"</div>
                     <div class="text-2xl font-semibold mt-1">
                         <Transition fallback=|| view!{ <span>"—"</span> }>
@@ -97,7 +97,7 @@ pub fn Dashboard() -> impl IntoView {
                     </div>
                 </div>
                 // Total Equity
-                <div class="bg-white rounded shadow p-4">
+                <div class="bg-white dark:bg-gray-900 rounded shadow p-4">
                     <div class="text-sm text-gray-600">"Total Equity"</div>
                     <div class="text-2xl font-semibold mt-1">
                         <Transition fallback=|| view!{ <span>"—"</span> }>
@@ -106,7 +106,7 @@ pub fn Dashboard() -> impl IntoView {
                     </div>
                 </div>
                 // Cash on Hand
-                <div class="bg-white rounded shadow p-4">
+                <div class="bg-white dark:bg-gray-900 rounded shadow p-4">
                     <div class="text-sm text-gray-600">"Cash on Hand"</div>
                     <div class="text-2xl font-semibold mt-1">
                         <Transition fallback=|| view!{ <span>"—"</span> }>
@@ -129,7 +129,7 @@ pub fn Dashboard() -> impl IntoView {
 
             <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
                 // AR Outstanding
-                <div class="bg-white rounded shadow p-4">
+                <div class="bg-white dark:bg-gray-900 rounded shadow p-4">
                     <div class="text-sm text-gray-600">"AR Outstanding"</div>
                     <div class="text-2xl font-semibold mt-1">
                         <Transition fallback=|| view!{ <span>"—"</span> }>
@@ -139,7 +139,7 @@ pub fn Dashboard() -> impl IntoView {
                     <div class="mt-2"><A class="text-akowe-blue-600 hover:underline" href="/reports/ar-aging">"View A/R Aging"</A></div>
                 </div>
                 // Overdue Invoices
-                <div class="bg-white rounded shadow p-4">
+                <div class="bg-white dark:bg-gray-900 rounded shadow p-4">
                     <div class="text-sm text-gray-600">"Overdue Invoices"</div>
                     <div class="text-2xl font-semibold mt-1">
                         <Transition fallback=|| view!{ <span>"—"</span> }>
@@ -195,7 +195,7 @@ pub fn Dashboard() -> impl IntoView {
 #[component]
 fn QuickLink(title: &'static str, href: &'static str, desc: &'static str) -> impl IntoView {
     view! {
-        <A href=href class="block bg-white rounded shadow p-4 hover:shadow-md transition">
+        <A href=href class="block bg-white dark:bg-gray-900 rounded shadow p-4 hover:shadow-md transition">
             <div class="text-lg font-semibold">{title}</div>
             <div class="text-sm text-gray-600">{desc}</div>
         </A>
@@ -205,7 +205,7 @@ fn QuickLink(title: &'static str, href: &'static str, desc: &'static str) -> imp
 #[component]
 fn RecentTransactionsView(res: Resource<(), Result<Vec<Transaction>, String>>) -> impl IntoView {
     view! {
-        <div class="bg-white rounded shadow p-4">
+        <div class="bg-white dark:bg-gray-900 rounded shadow p-4">
             <div class="text-lg font-semibold mb-2">"Recent Transactions"</div>
             <Transition fallback=move || view!{ <div>"Loading..."</div> }>
                 {move || match res.get() {
@@ -247,7 +247,7 @@ fn RecentTransactionsView(res: Resource<(), Result<Vec<Transaction>, String>>) -
 #[component]
 fn RecentPaymentsView(res: Resource<(), Result<Vec<Payment>, String>>) -> impl IntoView {
     view! {
-        <div class="bg-white rounded shadow p-4">
+        <div class="bg-white dark:bg-gray-900 rounded shadow p-4">
             <div class="text-lg font-semibold mb-2">"Recent Payments"</div>
             <Transition fallback=move || view!{ <div>"Loading..."</div> }>
                 {move || match res.get() {
@@ -293,7 +293,7 @@ fn RecentPaymentsView(res: Resource<(), Result<Vec<Payment>, String>>) -> impl I
 fn NetIncomeChart(res: Resource<(), Result<Vec<NetIncomePoint>, String>>) -> impl IntoView {
     view! {
         <div class="bg-white rounded shadow p-4">
-            <div class="text-lg font-semibold mb-2">"Net Income (last 6 months)"</div>
+            <div class="text-lg font-semibold mb-2">"Net Income (Last 6 Months)"</div>
             <Transition fallback=move || view!{ <div>"Loading..."</div> }>
                 {move || match res.get() {
                     Some(Ok(points)) => {
@@ -304,21 +304,23 @@ fn NetIncomeChart(res: Resource<(), Result<Vec<NetIncomePoint>, String>>) -> imp
                             let max_abs = entries.iter().map(|p| p.amount.abs()).fold(Decimal::ZERO, |acc, x| if x > acc { x } else { acc });
                             let max_f = max_abs.to_f64().unwrap_or(1.0).max(0.01);
                             view!{
-                                <div class="flex items-end gap-3 h-40">
-                                    {entries.into_iter().map(|pt| {
-                                        let height_px = (pt.amount.abs().to_f64().unwrap_or(0.0) / max_f * 120.0).max(4.0);
-                                        let bar_class = if pt.amount >= Decimal::ZERO { "bg-green-500" } else { "bg-red-500" };
-                                        let tooltip = format!("{}: {}", pt.label.clone(), format_money(&pt.amount));
-                                        view!{
-                                            <div class="flex flex-col items-center gap-1 w-12" title=tooltip.clone()>
-                                                <div class="w-full bg-gray-200 rounded-sm h-32 flex items-end" title=tooltip.clone()>
-                                                    <div class=bar_class style=format!("height: {:.1}px; width: 100%;", height_px) title=tooltip.clone()></div>
+                                <div class="overflow-x-auto">
+                                    <div class="min-w-max flex items-end gap-3 h-40 pr-2">
+                                        {entries.into_iter().map(|pt| {
+                                            let height_px = (pt.amount.abs().to_f64().unwrap_or(0.0) / max_f * 120.0).max(4.0);
+                                            let bar_class = if pt.amount >= Decimal::ZERO { "bg-green-500" } else { "bg-red-500" };
+                                            let tooltip = format!("{}: {}", pt.label.clone(), format_money(&pt.amount));
+                                            view!{
+                                                <div class="flex flex-col items-center gap-1 w-14" title=tooltip.clone()>
+                                                    <div class="w-full bg-gray-200 rounded-sm h-32 flex items-end" title=tooltip.clone()>
+                                                        <div class=bar_class style=format!("height: {:.1}px; width: 100%;", height_px) title=tooltip.clone()></div>
+                                                    </div>
+                                                    <div class="text-xs text-gray-600">{pt.label.clone()}</div>
+                                                    <div class="text-xs font-mono hidden md:block">{format_money_compact(&pt.amount)}</div>
                                                 </div>
-                                                <div class="text-xs text-gray-600">{pt.label.clone()}</div>
-                                                <div class="text-xs font-mono">{format_money(&pt.amount)}</div>
-                                            </div>
-                                        }
-                                    }).collect_view()}
+                                            }
+                                        }).collect_view()}
+                                    </div>
                                 </div>
                             }.into_view()
                         }
@@ -378,7 +380,7 @@ async fn fetch_cash_history(months: usize) -> Result<Vec<CashPoint>, String> {
 fn CashTrendChart(res: Resource<(), Result<Vec<CashPoint>, String>>) -> impl IntoView {
     view! {
         <div class="bg-white rounded shadow p-4">
-            <div class="text-lg font-semibold mb-2">"Cash on Hand (last 6 months)"</div>
+            <div class="text-lg font-semibold mb-2">"Cash on Hand (Last 6 Months)"</div>
             <Transition fallback=move || view!{ <div>"Loading..."</div> }>
                 {move || match res.get() {
                     Some(Ok(points)) => {
@@ -389,20 +391,22 @@ fn CashTrendChart(res: Resource<(), Result<Vec<CashPoint>, String>>) -> impl Int
                             let max_abs = entries.iter().map(|p| p.amount.abs()).fold(Decimal::ZERO, |acc, x| if x > acc { x } else { acc });
                             let max_f = max_abs.to_f64().unwrap_or(1.0).max(0.01);
                             view!{
-                                <div class="flex items-end gap-3 h-40">
-                                    {entries.into_iter().map(|pt| {
-                                        let height_px = (pt.amount.abs().to_f64().unwrap_or(0.0) / max_f * 120.0).max(4.0);
-                                        let tooltip = format!("{}: {}", pt.label.clone(), format_money(&pt.amount));
-                                        view!{
-                                            <div class="flex flex-col items-center gap-1 w-12" title=tooltip.clone()>
-                                                <div class="w-full bg-gray-200 rounded-sm h-32 flex items-end" title=tooltip.clone()>
-                                                    <div class="bg-blue-500" style=format!("height: {:.1}px; width: 100%;", height_px) title=tooltip.clone()></div>
+                                <div class="overflow-x-auto">
+                                    <div class="min-w-max flex items-end gap-3 h-40 pr-2">
+                                        {entries.into_iter().map(|pt| {
+                                            let height_px = (pt.amount.abs().to_f64().unwrap_or(0.0) / max_f * 120.0).max(4.0);
+                                            let tooltip = format!("{}: {}", pt.label.clone(), format_money(&pt.amount));
+                                            view!{
+                                                <div class="flex flex-col items-center gap-1 w-14" title=tooltip.clone()>
+                                                    <div class="w-full bg-gray-200 rounded-sm h-32 flex items-end" title=tooltip.clone()>
+                                                        <div class="bg-blue-500" style=format!("height: {:.1}px; width: 100%;", height_px) title=tooltip.clone()></div>
+                                                    </div>
+                                                    <div class="text-xs text-gray-600">{pt.label.clone()}</div>
+                                                    <div class="text-xs font-mono hidden md:block">{format_money_compact(&pt.amount)}</div>
                                                 </div>
-                                                <div class="text-xs text-gray-600">{pt.label.clone()}</div>
-                                                <div class="text-xs font-mono">{format_money(&pt.amount)}</div>
-                                            </div>
-                                        }
-                                    }).collect_view()}
+                                            }
+                                        }).collect_view()}
+                                    </div>
                                 </div>
                             }.into_view()
                         }

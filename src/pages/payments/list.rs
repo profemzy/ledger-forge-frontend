@@ -5,6 +5,7 @@ use leptos_router::{A, use_query_map};
 use crate::api::payments as api;
 use crate::api::contacts as contacts_api;
 use crate::types::payments::Payment;
+use crate::components::ui::{ButtonLink, Table};
 use crate::utils::format::format_money;
 use crate::types::contacts::Contact;
 
@@ -40,7 +41,7 @@ pub fn PaymentsList() -> impl IntoView {
         <div class="p-6">
             <div class="flex items-center justify-between mb-4">
                 <h1 class="text-2xl font-semibold">"Payments"</h1>
-                <a href="/payments/new" class="bg-blue-600 text-white px-4 py-2 rounded">"New Payment"</a>
+                <ButtonLink href="/payments/new" variant="primary">{"New Payment"}</ButtonLink>
             </div>
 
             <div class="flex gap-4 mb-4 items-center">
@@ -71,9 +72,9 @@ pub fn PaymentsList() -> impl IntoView {
 #[component]
 fn PaymentsTable(items: Vec<Payment>, contacts: Option<std::collections::HashMap<Uuid, String>>) -> impl IntoView {
     view! {
-        <table class="w-full border-collapse bg-white rounded shadow">
+        <Table>
             <thead>
-                <tr class="text-left border-b">
+                <tr class="text-left border-b bg-gray-50">
                     <th class="py-2 px-3 text-gray-600">"Date"</th>
                     <th class="py-2 px-3 text-gray-600">"Number"</th>
                     <th class="py-2 px-3 text-gray-600">"Customer"</th>
@@ -86,7 +87,7 @@ fn PaymentsTable(items: Vec<Payment>, contacts: Option<std::collections::HashMap
                 {items.into_iter().map(|p| {
                     let cname = contacts.as_ref().and_then(|m| m.get(&p.customer_id)).cloned().unwrap_or_else(|| p.customer_id.to_string());
                     view!{
-                        <tr class="border-b hover:bg-gray-50">
+                        <tr class="border-b hover:bg-gray-50 dark:hover:bg-gray-800">
                             <td class="py-2 px-3">{p.payment_date.to_string()}</td>
                             <td class="py-2 px-3 font-mono text-sm"><A class="text-akowe-blue-600 hover:underline" href=format!("/payments/{}", p.id)>{p.payment_number.unwrap_or_else(|| "—".into())}</A></td>
                             <td class="py-2 px-3">{cname}</td>
@@ -97,6 +98,6 @@ fn PaymentsTable(items: Vec<Payment>, contacts: Option<std::collections::HashMap
                     }
                 }).collect_view()}
             </tbody>
-        </table>
+        </Table>
     }
 }
