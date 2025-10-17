@@ -1,6 +1,7 @@
 use leptos::*;
 use leptos_router::{use_params_map, A, use_navigate};
 use uuid::Uuid;
+use std::rc::Rc;
 
 use crate::api::transactions as api;
 use crate::types::transactions::{TransactionWithLineItems, TransactionStatus};
@@ -8,6 +9,7 @@ use crate::state::{ToastContext, ToastKind};
 use crate::utils::format::format_money;
 use crate::types::accounts::Account;
 use crate::api::accounts as accounts_api;
+use crate::components::modal::Modal;
 
 #[component]
 pub fn TransactionDetail() -> impl IntoView {
@@ -73,13 +75,11 @@ pub fn TransactionDetail() -> impl IntoView {
         let toaster = toaster_c3.clone();
         async move {
             if let Some(id_str) = id_opt { if let Ok(id) = Uuid::parse_str(&id_str) {
-                if web_sys::window().and_then(|w| w.confirm_with_message("Delete this draft? This cannot be undone.").ok()).unwrap_or(false) {
-                    match api::delete_transaction(id).await {
-                        Ok(_) => { if let Some(t) = toaster { t.push("Transaction deleted", ToastKind::Success); } },
-                        Err(e) => { if let Some(t) = toaster { t.push(e, ToastKind::Error); } }
-                    }
-                    navigate("/transactions", Default::default());
+                match api::delete_transaction(id).await {
+                    Ok(_) => { if let Some(t) = toaster { t.push("Transaction deleted", ToastKind::Success); } },
+                    Err(e) => { if let Some(t) = toaster { t.push(e, ToastKind::Error); } }
                 }
+                navigate("/transactions", Default::default());
             }}
         }
     });
@@ -110,6 +110,8 @@ fn TxView(tx: TransactionWithLineItems, accounts: Option<Vec<Account>>, post: Ac
     // Build lookup map for accounts
     let lookup = accounts.map(|v| v.into_iter().map(|a| (a.id, format!("{} - {}", a.code, a.name))).collect::<std::collections::HashMap<_, _>>());
 
+    let (show_delete, set_show_delete) = create_signal(false);
+
     view! {
         <div class="space-y-4">
             <div class="text-sm text-gray-600"><A class="text-akowe-blue-600 hover:underline" href="/transactions">"Transactions"</A> " / " {tx.transaction.id.to_string()}</div>
@@ -126,7 +128,7 @@ fn TxView(tx: TransactionWithLineItems, accounts: Option<Vec<Account>>, post: Ac
                     <div class="space-x-2">
                         { if can_post { view!{ <button class="bg-green-600 text-white px-3 py-2 rounded" on:click=move |_| post.dispatch(())>"Post"</button> }.into_view() } else { view!{ <span/> }.into_view() } }
                         { if can_void { view!{ <button class="bg-red-600 text-white px-3 py-2 rounded" on:click=move |_| void.dispatch(())>"Void"</button> }.into_view() } else { view!{ <span/> }.into_view() } }
-                        { if can_delete { view!{ <button class="bg-gray-600 text-white px-3 py-2 rounded" on:click=move |_| del.dispatch(())>"Delete"</button> }.into_view() } else { view!{ <span/> }.into_view() } }
+                        { if can_delete { view!{ <button class="bg-gray-600 text-white px-3 py-2 rounded" on:click=move |_| set_show_delete.set(true)>"Delete"</button> }.into_view() } else { view!{ <span/> }.into_view() } }
                     </div>
                 </div>
             </div>
@@ -166,6 +168,14 @@ fn TxView(tx: TransactionWithLineItems, accounts: Option<Vec<Account>>, post: Ac
                     }
                 }
             </div>
+            <Modal show=show_delete on_close=Callback::new(move |_| set_show_delete.set(false)) title="Delete Transaction".to_string()
+                actions=Rc::new(move || view!{
+                    <button class="px-3 py-1 rounded border" on:click=move |_| set_show_delete.set(false)>"Cancel"</button>
+                    <button class="px-3 py-1 rounded bg-red-600 text-white" on:click=move |_| { del.dispatch(()); set_show_delete.set(false); }>"Delete"</button>
+                })
+            >
+                <p>{"Delete this draft transaction? This cannot be undone."}</p>
+            </Modal>
         </div>
     }
 }

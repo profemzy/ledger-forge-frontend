@@ -74,20 +74,21 @@
 ## 📋 Upcoming Tasks
 
 ### Dashboard & Reporting
-- [ ] Chart components (line/bar) with tooltips
+- [x] Chart components (bar) with tooltips; line pending
 - [x] Reporting exports (CSV / PDF)
 - [x] Drill-down links (overdue invoices, unapplied payments, AR aging)
-- [ ] KPI variance vs prior period
+- [x] KPI variance vs prior period (delta vs last month)
 
 - [x] Invoice detail: surface payment applications
 - [ ] Overdue invoices quick actions (reminders, mark sent)
 
-### Accounts Payable (Future)
-- [ ] Bills & bill payments UI
+### Accounts Payable (AP)
+- [x] Bills UI (list/create/detail)
+- [ ] Bill payments UI
 
 ### Polish
 - [x] Client-side numeric formatting / masking for money & quantities
-- [x] Extract reusable UI primitives (Button, Input, Table) (Modal later)
+- [x] Extract reusable UI primitives (Button, Input, Table, Modal)
 - [x] Light/dark theme toggle with class strategy
 
 ---

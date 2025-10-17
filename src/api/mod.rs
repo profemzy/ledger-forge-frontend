@@ -9,3 +9,4 @@ pub mod contacts;
 pub mod invoices;
 pub mod payments;
 pub mod reporting;
+pub mod bills;

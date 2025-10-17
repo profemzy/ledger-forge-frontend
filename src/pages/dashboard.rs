@@ -1,15 +1,15 @@
 use leptos::*;
 use leptos_router::*;
 use rust_decimal::Decimal;
-use rust_decimal::prelude::ToPrimitive;
 use chrono::{Datelike, NaiveDate, Utc, Duration};
 use chrono::Months;
 
 use crate::state::AuthContext;
 use crate::api::{invoices as inv_api, payments as pay_api, transactions as tx_api, reporting};
-use crate::utils::format::{format_money, format_money_compact};
+use crate::utils::format::format_money;
 use crate::types::transactions::Transaction;
 use crate::types::payments::Payment;
+use crate::components::ui::{ChartBars, ChartPoint};
 
 #[derive(Clone, Debug, serde::Deserialize, serde::Serialize)]
 struct NetIncomePoint {
@@ -45,11 +45,13 @@ pub fn Dashboard() -> impl IntoView {
 
     let (as_of, set_as_of) = create_signal(today_ymd());
 
-    // Balance sheet
+    // Balance sheet (current and previous month for deltas)
     let bs_res = create_resource(move || as_of.get(), |date| async move { reporting::get_balance_sheet(&date).await });
+    let bs_prev_res = create_resource(move || as_of.get(), |date| async move { reporting::get_balance_sheet(&prev_month_end(&date)).await });
 
-    // AR aging
+    // AR aging (current and previous month for deltas)
     let ar_res = create_resource(move || as_of.get(), |date| async move { reporting::get_ar_aging(&date).await });
+    let ar_prev_res = create_resource(move || as_of.get(), |date| async move { reporting::get_ar_aging(&prev_month_end(&date)).await });
 
     // Overdue invoices
     let overdue_res = create_resource(|| (), |_| async move { inv_api::get_overdue_invoices().await });
@@ -74,6 +76,14 @@ pub fn Dashboard() -> impl IntoView {
                 <div>
                     <label class="block text-sm text-gray-600">"As of date"</label>
                     <input class="border rounded px-3 py-2" type="date" prop:value=move || as_of.get() on:input=move |e| set_as_of.set(event_target_value(&e)) />
+                    <div class="text-xs text-gray-500 dark:text-gray-400 mt-1">
+                        <Transition fallback=|| view!{ <span/> }>
+                            {move || match (bs_res.get(), bs_prev_res.get()) {
+                                (Some(Ok(cur)), Some(Ok(prev))) => view!{ <span>{delta_pct(cur.total_assets, prev.total_assets)}</span> }.into_view(),
+                                _ => view!{ <span/> }.into_view(),
+                            }}
+                        </Transition>
+                    </div>
                 </div>
             </div>
 
@@ -86,6 +96,14 @@ pub fn Dashboard() -> impl IntoView {
                             {move || bs_res.get().map(|r| match r { Ok(bs) => format_money(&bs.total_assets), Err(_) => "—".into() })}
                         </Transition>
                     </div>
+                    <div class="text-xs text-gray-500 dark:text-gray-400 mt-1">
+                        <Transition fallback=|| view!{ <span/> }>
+                            {move || match (bs_res.get(), bs_prev_res.get()) {
+                                (Some(Ok(cur)), Some(Ok(prev))) => view!{ <span>{delta_pct(cur.total_liabilities, prev.total_liabilities)}</span> }.into_view(),
+                                _ => view!{ <span/> }.into_view(),
+                            }}
+                        </Transition>
+                    </div>
                 </div>
                 // Total Liabilities
                 <div class="bg-white dark:bg-gray-900 rounded shadow p-4">
@@ -95,6 +113,14 @@ pub fn Dashboard() -> impl IntoView {
                             {move || bs_res.get().map(|r| match r { Ok(bs) => format_money(&bs.total_liabilities), Err(_) => "—".into() })}
                         </Transition>
                     </div>
+                    <div class="text-xs text-gray-500 dark:text-gray-400 mt-1">
+                        <Transition fallback=|| view!{ <span/> }>
+                            {move || match (bs_res.get(), bs_prev_res.get()) {
+                                (Some(Ok(cur)), Some(Ok(prev))) => view!{ <span>{delta_pct(cur.total_equity, prev.total_equity)}</span> }.into_view(),
+                                _ => view!{ <span/> }.into_view(),
+                            }}
+                        </Transition>
+                    </div>
                 </div>
                 // Total Equity
                 <div class="bg-white dark:bg-gray-900 rounded shadow p-4">
@@ -102,6 +128,14 @@ pub fn Dashboard() -> impl IntoView {
                     <div class="text-2xl font-semibold mt-1">
                         <Transition fallback=|| view!{ <span>"—"</span> }>
                             {move || bs_res.get().map(|r| match r { Ok(bs) => format_money(&bs.total_equity), Err(_) => "—".into() })}
+                        </Transition>
+                    </div>
+                    <div class="text-xs text-gray-500 dark:text-gray-400 mt-1">
+                        <Transition fallback=|| view!{ <span/> }>
+                            {move || match (ar_res.get(), ar_prev_res.get()) {
+                                (Some(Ok(cur)), Some(Ok(prev))) => view!{ <span>{delta_pct(cur.total_outstanding, prev.total_outstanding)}</span> }.into_view(),
+                                _ => view!{ <span/> }.into_view(),
+                            }}
                         </Transition>
                     </div>
                 </div>
@@ -300,29 +334,8 @@ fn NetIncomeChart(res: Resource<(), Result<Vec<NetIncomePoint>, String>>) -> imp
                         if points.is_empty() {
                             view!{ <div class="text-gray-600">"No data."</div> }.into_view()
                         } else {
-                            let entries = points.clone();
-                            let max_abs = entries.iter().map(|p| p.amount.abs()).fold(Decimal::ZERO, |acc, x| if x > acc { x } else { acc });
-                            let max_f = max_abs.to_f64().unwrap_or(1.0).max(0.01);
-                            view!{
-                                <div class="overflow-x-auto">
-                                    <div class="min-w-max flex items-end gap-3 h-40 pr-2">
-                                        {entries.into_iter().map(|pt| {
-                                            let height_px = (pt.amount.abs().to_f64().unwrap_or(0.0) / max_f * 120.0).max(4.0);
-                                            let bar_class = if pt.amount >= Decimal::ZERO { "bg-green-500" } else { "bg-red-500" };
-                                            let tooltip = format!("{}: {}", pt.label.clone(), format_money(&pt.amount));
-                                            view!{
-                                                <div class="flex flex-col items-center gap-1 w-14" title=tooltip.clone()>
-                                                    <div class="w-full bg-gray-200 rounded-sm h-32 flex items-end" title=tooltip.clone()>
-                                                        <div class=bar_class style=format!("height: {:.1}px; width: 100%;", height_px) title=tooltip.clone()></div>
-                                                    </div>
-                                                    <div class="text-xs text-gray-600">{pt.label.clone()}</div>
-                                                    <div class="text-xs font-mono hidden md:block">{format_money_compact(&pt.amount)}</div>
-                                                </div>
-                                            }
-                                        }).collect_view()}
-                                    </div>
-                                </div>
-                            }.into_view()
+                            let entries: Vec<ChartPoint> = points.clone().into_iter().map(|p| ChartPoint { label: p.label, amount: p.amount }).collect();
+                            view!{ <ChartBars entries=entries positive_color="bg-green-500" negative_color="bg-red-500"/> }.into_view()
                         }
                     }
                     Some(Err(e)) => view!{ <div class="text-red-600">{e}</div> }.into_view(),
@@ -376,6 +389,25 @@ async fn fetch_cash_history(months: usize) -> Result<Vec<CashPoint>, String> {
     Ok(points)
 }
 
+fn prev_month_end(date_str: &str) -> String {
+    if let Ok(d) = NaiveDate::parse_from_str(date_str, "%Y-%m-%d") {
+        let first = NaiveDate::from_ymd_opt(d.year(), d.month(), 1).unwrap();
+        let prev = first.checked_sub_months(Months::new(1)).unwrap();
+        let next = prev.checked_add_months(Months::new(1)).unwrap();
+        let end = next - Duration::days(1);
+        return end.to_string();
+    }
+    date_str.to_string()
+}
+
+fn delta_pct(cur: Decimal, prev: Decimal) -> String {
+    if prev.is_zero() { return "—".into(); }
+    let diff = cur - prev;
+    let pct = (diff / prev) * Decimal::new(100, 0);
+    let sign = if diff >= Decimal::ZERO { "+" } else { "" };
+    format!("{}{}% vs last month", sign, pct.round_dp(1))
+}
+
 #[component]
 fn CashTrendChart(res: Resource<(), Result<Vec<CashPoint>, String>>) -> impl IntoView {
     view! {
@@ -387,28 +419,8 @@ fn CashTrendChart(res: Resource<(), Result<Vec<CashPoint>, String>>) -> impl Int
                         if points.is_empty() {
                             view!{ <div class="text-gray-600">"No data."</div> }.into_view()
                         } else {
-                            let entries = points.clone();
-                            let max_abs = entries.iter().map(|p| p.amount.abs()).fold(Decimal::ZERO, |acc, x| if x > acc { x } else { acc });
-                            let max_f = max_abs.to_f64().unwrap_or(1.0).max(0.01);
-                            view!{
-                                <div class="overflow-x-auto">
-                                    <div class="min-w-max flex items-end gap-3 h-40 pr-2">
-                                        {entries.into_iter().map(|pt| {
-                                            let height_px = (pt.amount.abs().to_f64().unwrap_or(0.0) / max_f * 120.0).max(4.0);
-                                            let tooltip = format!("{}: {}", pt.label.clone(), format_money(&pt.amount));
-                                            view!{
-                                                <div class="flex flex-col items-center gap-1 w-14" title=tooltip.clone()>
-                                                    <div class="w-full bg-gray-200 rounded-sm h-32 flex items-end" title=tooltip.clone()>
-                                                        <div class="bg-blue-500" style=format!("height: {:.1}px; width: 100%;", height_px) title=tooltip.clone()></div>
-                                                    </div>
-                                                    <div class="text-xs text-gray-600">{pt.label.clone()}</div>
-                                                    <div class="text-xs font-mono hidden md:block">{format_money_compact(&pt.amount)}</div>
-                                                </div>
-                                            }
-                                        }).collect_view()}
-                                    </div>
-                                </div>
-                            }.into_view()
+                            let entries: Vec<ChartPoint> = points.clone().into_iter().map(|p| ChartPoint { label: p.label, amount: p.amount }).collect();
+                            view!{ <ChartBars entries=entries positive_color="bg-blue-500" negative_color="bg-blue-500"/> }.into_view()
                         }
                     }
                     Some(Err(e)) => view!{ <div class="text-red-600">{e}</div> }.into_view(),

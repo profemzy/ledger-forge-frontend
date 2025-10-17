@@ -10,6 +10,7 @@ use crate::pages::invoices::{InvoicesList, InvoiceCreate, InvoiceDetail};
 use crate::pages::payments::{PaymentsList, PaymentCreate};
 use crate::pages::reporting::{ReportsIndex, TrialBalancePage, ProfitLossPage, BalanceSheetPage, ARAgingPage};
 use crate::pages::accounts::{AccountsList, AccountCreate, AccountDetail};
+use crate::pages::bills::{BillsList, BillCreate, BillDetail};
 use crate::state::AuthContext;
 
 #[component]
@@ -44,6 +45,9 @@ pub fn App() -> impl IntoView {
                         <Route path="/payments" view=PaymentsList/>
                         <Route path="/payments/new" view=PaymentCreate/>
                         <Route path="/payments/:id" view=crate::pages::payments::detail::PaymentDetail/>
+                        <Route path="/bills" view=BillsList/>
+                        <Route path="/bills/new" view=BillCreate/>
+                        <Route path="/bills/:id" view=BillDetail/>
                         <Route path="/reports" view=ReportsIndex/>
                         <Route path="/reports/trial-balance" view=TrialBalancePage/>
                         <Route path="/reports/profit-loss" view=ProfitLossPage/>

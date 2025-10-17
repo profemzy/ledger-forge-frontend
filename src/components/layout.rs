@@ -85,6 +85,7 @@ pub fn Layout() -> impl IntoView {
                     <A class={move || if is_active("/transactions") { "block px-3 py-2 rounded bg-akowe-blue-50 text-akowe-blue-700 font-medium dark:bg-blue-950 dark:text-blue-100" } else { "block px-3 py-2 rounded text-gray-700 hover:bg-gray-100 dark:text-gray-200 dark:hover:bg-gray-800" }} href="/transactions">"Transactions"</A>
                     <A class={move || if is_active("/invoices") { "block px-3 py-2 rounded bg-akowe-blue-50 text-akowe-blue-700 font-medium dark:bg-blue-950 dark:text-blue-100" } else { "block px-3 py-2 rounded text-gray-700 hover:bg-gray-100 dark:text-gray-200 dark:hover:bg-gray-800" }} href="/invoices">"Invoices"</A>
                     <A class={move || if is_active("/payments") { "block px-3 py-2 rounded bg-akowe-blue-50 text-akowe-blue-700 font-medium dark:bg-blue-950 dark:text-blue-100" } else { "block px-3 py-2 rounded text-gray-700 hover:bg-gray-100 dark:text-gray-200 dark:hover:bg-gray-800" }} href="/payments">"Payments"</A>
+                    <A class={move || if is_active("/bills") { "block px-3 py-2 rounded bg-akowe-blue-50 text-akowe-blue-700 font-medium dark:bg-blue-950 dark:text-blue-100" } else { "block px-3 py-2 rounded text-gray-700 hover:bg-gray-100 dark:text-gray-200 dark:hover:bg-gray-800" }} href="/bills">"Bills"</A>
                 </nav>
             </aside>
             <div class="flex-1 flex flex-col">
